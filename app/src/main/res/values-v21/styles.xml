@@ -1,0 +1,17 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="TextAppearance.Dialer.NumberItem" parent="TextAppearance.AppCompat.Large">
+        <item name="android:textColor">@color/ab_primary</item>
+        <item name="android:textSize">@dimen/num_pad_number</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="TextAppearance.Dialer.Number" parent="TextAppearance.AppCompat.Large">
+        <item name="android:textSize">@dimen/dialer_number</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+</resources>

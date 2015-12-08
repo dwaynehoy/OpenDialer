@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/relativeLayoutSearchView"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:ignore="Overdraw">
+
+    <FrameLayout
+        android:alpha="0"
+        android:id="@+id/search_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" android:background="@color/bg_window_light"/>
+
+    <LinearLayout
+        android:id="@+id/dialer_container"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dialer_height"
+        android:orientation="vertical"
+        android:gravity="bottom"/>
+
+</RelativeLayout>

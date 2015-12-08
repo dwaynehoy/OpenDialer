@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical">
+
+    <com.squizbit.opendialer.library.widget.BottomSheet.BottomSheetView
+        android:id="@+id/bottomSheetSlideView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <FrameLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/layoutRoot"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/bg_window_dark"
+            android:orientation="vertical"/>
+    </com.squizbit.opendialer.library.widget.BottomSheet.BottomSheetView>
+</RelativeLayout>

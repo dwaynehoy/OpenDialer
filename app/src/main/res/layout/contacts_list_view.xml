@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/linear_layout_contact_list_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cardViewToolbarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        card_view:cardCornerRadius="0dp"
+        card_view:cardElevation="2dp">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbarMain"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:background="@color/bg_window_light"
+            android:minHeight="?attr/actionBarSize"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:theme="@style/ThemeOverlay.AppCompat.ActionBar">
+
+            <EditText
+                android:id="@+id/editTextSearch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/card_horizontal_padding"
+                android:layout_marginRight="@dimen/card_horizontal_padding"
+                android:hint="@string/abc_search_hint"
+                android:imeOptions="actionSearch"
+                android:inputType="textCapWords"/>
+        </android.support.v7.widget.Toolbar>
+    </android.support.v7.widget.CardView>
+
+    <com.squizbit.opendialer.library.widget.RecycleviewIndexer.RecyclerViewFastScroller
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/recyclerViewFastScroller"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/contact_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/list_fab_clearance_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:scrollbars="vertical" />
+
+    </com.squizbit.opendialer.library.widget.RecycleviewIndexer.RecyclerViewFastScroller>
+</LinearLayout>

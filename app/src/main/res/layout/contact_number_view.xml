@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/large_list_item_height"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="@drawable/bg_list_item">
+
+    <ImageView
+        android:id="@+id/imageViewType"
+        android:layout_width="@dimen/large_list_item_height"
+        android:layout_height="@dimen/large_list_item_height"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_action_call"
+        android:contentDescription="@string/contact_image_desc"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/imageViewType"
+        android:layout_toEndOf="@+id/imageViewType">
+
+        <TextView
+            android:id="@+id/textViewItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.Body1"
+            tools:text="+61 418 204 586"/>
+
+        <TextView
+            android:id="@+id/textViewType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:paddingTop="2dp"
+            tools:text="Mobile"/>
+    </LinearLayout>
+
+
+</RelativeLayout>

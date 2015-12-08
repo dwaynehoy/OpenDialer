@@ -1,0 +1,40 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="text_horizontal_margin">16dp</dimen>
+    <dimen name="half_card_margin">8dp</dimen>
+
+    <dimen name="rounded_button_radius">5dp</dimen>
+
+    <dimen name="dialer_number">35sp</dimen>
+    <dimen name="num_pad_text_offset">-8dp</dimen>
+    <dimen name="num_pad_number">35dp</dimen>
+    <dimen name="key_horizontal_padding">16dp</dimen>
+    <dimen name="fab_spacing_vertical">80dp</dimen>
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="dialer_height">400dp</dimen>
+
+    <dimen name="card_vertical_padding">16dp</dimen>
+    <dimen name="large_list_item_height">72dp</dimen>
+
+    <dimen name="contact_thumbnail">40dp</dimen>
+    <dimen name="contact_corner_radius">20dp</dimen>
+    <dimen name="list_fab_clearance_margin">80dp</dimen>
+    <dimen name="compound_padding">2dp</dimen>
+
+    <dimen name="contact_header_height">250dp</dimen>
+    <dimen name="statusbar_height">0dp</dimen>
+
+    <dimen name="bottomsheet_intial_visiblity">420dp</dimen>
+    <dimen name="card_horizontal_padding">16dp</dimen>
+    <dimen name="shadow_height">3dp</dimen>
+    <dimen name="large_shadow_height">8dp</dimen>
+    <dimen name="favorite_card_grid_padding">2dp</dimen>
+
+    <dimen name="small_card_height">177dp</dimen>
+    <dimen name="md_button_min_width">48dp</dimen>
+    <dimen name="md_button_height">48dp</dimen>
+
+    <dimen name="star_touch_area">32dp</dimen>
+</resources>
