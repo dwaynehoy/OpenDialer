@@ -72,6 +72,7 @@ public class NavActivity extends AppCompatActivity implements FabControllerOwner
         NavFragmentAdapter fragmentAdapter = new NavFragmentAdapter(getSupportFragmentManager());
         mNavViewPager.setAdapter(fragmentAdapter);
         mNavTabLayout.setupWithViewPager(mNavViewPager);
+        mNavViewPager.setOffscreenPageLimit(2);
     }
 
     @Override
