@@ -39,6 +39,8 @@ android {
             }
         } else {
             production {
+                //This key allows testing of product buildtype code without providing access to
+                //the real production key
                 storeFile file("keystore.jks")
                 storePassword "keystore"
                 keyAlias "pseudoprod"
@@ -62,12 +64,10 @@ android {
     }
 
     buildTypes {
-        if(System.getenv("OPENDIALER_PROD_KEYSTORE") != null) {
-            release {
-                minifyEnabled false
-                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-                signingConfig signingConfigs.production
-            }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.production
         }
 
         debug {
