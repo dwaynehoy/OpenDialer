@@ -8,6 +8,7 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -27,6 +28,8 @@ import com.squizbit.opendialer.fragment.DialerSearchFragment;
 import com.squizbit.opendialer.fragment.FavoritesFragment;
 import com.squizbit.opendialer.library.FabControllable;
 import com.squizbit.opendialer.library.FabControllerOwner;
+
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -79,6 +82,16 @@ public class NavActivity extends AppCompatActivity implements FabControllerOwner
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search_menu, menu);
         return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        //Default behavior is to only notify the calling fragment, however because we have multiple fragments requesting
+        //the same permissions, we need to notify all fragments so they can refresh data where needed.
+        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+        for(int i = 0; i < fragmentList.size(); i++){
+            fragmentList.get(i).onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.squizbit.opendialer.data;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -8,6 +10,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -87,8 +90,17 @@ public abstract class ContactLookupAdapter<T extends RecyclerView.ViewHolder> ex
         }
     }
 
+    /**
+     * Returns the contact based on the number if found
+     * @param number The number to perform the contact lookup for.
+     * @return The contact if found, null if not or the READ_CONTACTS permission is not granted
+     */
     @Nullable
     protected Contact getContact(String number){
+        if(ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_CONTACTS) != PackageInfo.REQUESTED_PERMISSION_GRANTED){
+            return null;
+        }
+
         int contactPosition = lookupContact(number);
         if(mContactsCursor == null || mContactsCursor.isClosed()){
             contactPosition = -1;

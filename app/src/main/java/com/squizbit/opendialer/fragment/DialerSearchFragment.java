@@ -3,10 +3,10 @@ package com.squizbit.opendialer.fragment;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -19,17 +19,19 @@ import android.widget.RelativeLayout;
 
 import com.squizbit.opendialer.R;
 import com.squizbit.opendialer.data.ContactSearchAdapter;
+import com.squizbit.opendialer.models.DialerHelper;
 import com.squizbit.opendialer.library.FabControllable;
 import com.squizbit.opendialer.library.FabControllerOwner;
 import com.squizbit.opendialer.models.Preferences;
+
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 /**
  * A fragment which contains a dialer and provides a list of items that match the dialed numbers.
- * The
- * user can select an item for the list to dial
+ * The user can select an item for the list to dial
  */
 public class DialerSearchFragment extends Fragment implements FabControllable, ContactSearchAdapter.OnContactSelectedListener, ContactSearchFragment.OnScrollStateChangedListener {
 
@@ -57,6 +59,7 @@ public class DialerSearchFragment extends Fragment implements FabControllable, C
     private boolean mIsDialerVisible;
     private DialerFragment mDialerFragment;
     private ContactSearchFragment mContactSearchFragment;
+    private DialerHelper mDialerHelper;
 
     private DialerFragment.OnNumberChangedListener mOnNumberChangedListener = new DialerFragment.OnNumberChangedListener() {
         @Override
@@ -82,10 +85,7 @@ public class DialerSearchFragment extends Fragment implements FabControllable, C
             mDialerFragment.setNumber(preferences.getLastDialedNumber());
         } else {
             preferences.setLastDialedNumber(number);
-            Intent intent = new Intent(Intent.ACTION_CALL);
-
-            intent.setData(Uri.parse("tel:" + number));
-            startActivity(intent);
+            mDialerHelper.dialNumber(number);
 
             mOwner.onFabControllableClosing(DialerSearchFragment.this);
             closeFragment();
@@ -112,23 +112,6 @@ public class DialerSearchFragment extends Fragment implements FabControllable, C
         return fragment;
     }
 
-    /**
-     * Creates a new instance of the DialerSearchFragment with a preset number
-     * @param number The number to preset
-     * @return A new instance of the DialerSearchFragment
-     */
-    public static Fragment newInstance(String number) {
-
-        Bundle args = new Bundle();
-        args.putInt("mode", SEARCH_MODE_DIALER);
-        args.putString("number", number);
-
-        Fragment fragment = new DialerSearchFragment();
-        fragment.setArguments(args);
-        return fragment;
-
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialer_overlap_view, container, false);
@@ -153,6 +136,13 @@ public class DialerSearchFragment extends Fragment implements FabControllable, C
         mOwner.onFabStatusChanged(this);
 
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        mDialerHelper = new DialerHelper(getActivity());
+
+        super.onActivityCreated(savedInstanceState);
     }
 
     private void initFragments() {
@@ -188,11 +178,21 @@ public class DialerSearchFragment extends Fragment implements FabControllable, C
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        mDialerHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        //Passing this on to any child fragments that may be interested
+        List<Fragment> fragmentList = getChildFragmentManager().getFragments();
+        for(int i = 0; i < fragmentList.size(); i++){
+            fragmentList.get(i).onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.reset(this);
     }
-
 
     private void closeFragment() {
         mIsDialerVisible = false;
@@ -249,9 +249,7 @@ public class DialerSearchFragment extends Fragment implements FabControllable, C
             showDialer();
         }
 
-        if(getArguments().containsKey("number")){
-            mDialerFragment.setNumber(getArguments().getString("number"));
-        }
+        mDialerFragment.setNumber(getArguments().getString("number", ""));
     }
 
     private void showDialer() {

@@ -1,13 +1,18 @@
 package com.squizbit.opendialer.fragment;
 
+import android.Manifest;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -15,7 +20,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -42,10 +46,11 @@ import butterknife.InjectView;
  * A fragment which displays a list of the users system contacts, and allows a user to select one
  * to call
  */
-public class ContactSearchFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
-        TextWatcher {
+public class ContactSearchFragment extends Fragment implements TextWatcher {
 
     private static final Pattern PHONE_NUMBER_MATCHER = Pattern.compile("^\\+?[0-9\\-]+\\*?$");
+    public static final int ROW_ID_PERMISSIONS = -2;
+    public static final int ROW_ID_FREE_SEARCH = -1;
 
     //region View fields
     @InjectView(R.id.linear_layout_contact_list_main)
@@ -53,9 +58,6 @@ public class ContactSearchFragment extends Fragment implements LoaderManager.Loa
 
     @InjectView(R.id.contact_list)
     RecyclerView mContactList;
-
-    @InjectView(R.id.toolbarMain)
-    Toolbar mToolbarMain;
 
     @InjectView(R.id.recyclerViewFastScroller)
     RecyclerViewFastScroller mRecyclerViewFastScroller;
@@ -69,7 +71,7 @@ public class ContactSearchFragment extends Fragment implements LoaderManager.Loa
 
     private ContactSearchAdapter mContactsAdapter;
     private String mQuery = "";
-    private OnContactSelectedListener mRecipientSelectedListener;
+    private ContactSearchAdapter.OnContactSelectedListener mRecipientSelectedListener;
     private KeyboardDismisser mKeyboardDismisser;
     private OnScrollStateChangedListener mOnScrollStateChangedListener;
 
@@ -87,8 +89,13 @@ public class ContactSearchFragment extends Fragment implements LoaderManager.Loa
     private ContactSearchAdapter.OnContactSelectedListener mOnContactSelectedListener = new ContactSearchAdapter.OnContactSelectedListener() {
         @Override
         public void onContactSelected(Cursor contact) {
-            if (mRecipientSelectedListener != null) {
-                mRecipientSelectedListener.onRecipientSelected(contact.getString(1), !contact.isNull(3) ? contact.getString(3) : contact.getString(4));
+            if(contact.getInt(0) == ROW_ID_PERMISSIONS) {
+                ActivityCompat.requestPermissions(
+                        getActivity(),
+                        new String[]{Manifest.permission.READ_CONTACTS},
+                        1);
+            } else if(mRecipientSelectedListener != null) {
+                mRecipientSelectedListener.onContactSelected(contact);
             }
         }
     };
@@ -102,7 +109,7 @@ public class ContactSearchFragment extends Fragment implements LoaderManager.Loa
      * @param displayOnlyOnSearch A flag indicating whether results should be shown if the query
      *                            string
      *                            is empty
-     * @param preHideSearchBar A flag which indicates whether the search bar should be initially visible
+     * @param preHideSearchBar    A flag which indicates whether the search bar should be initially visible
      * @return A new instance of the ContactSearchFragment
      */
     public static Fragment newInstance(String rawSearchAction, boolean displayOnlyOnSearch, boolean preHideSearchBar) {
@@ -119,7 +126,7 @@ public class ContactSearchFragment extends Fragment implements LoaderManager.Loa
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.contacts_list_view, container, false);
+        View view = inflater.inflate(R.layout.contact_search_list_view, container, false);
         ButterKnife.inject(this, view);
 
         mContactList.setFocusable(true);
@@ -155,23 +162,19 @@ public class ContactSearchFragment extends Fragment implements LoaderManager.Loa
         mEditTextSearch.requestFocus();
         mContactList.setLayoutManager(new LinearLayoutManager(getActivity()));
         if (doRunQuery()) {
-            getLoaderManager().initLoader(0, null, this);
+            runSearch();
         }
     }
 
     /**
-     * Sets a callback which will be invoked when a recipient is selected by the user
-     *
-     * @param recipientSelectedListener The callback to be invoked
+     * Hides the search bar by animating it upwards off the screen
      */
-    public void setRecipientSelectedListener(OnContactSelectedListener recipientSelectedListener) {
-        mRecipientSelectedListener = recipientSelectedListener;
-    }
+    public void hideSearchBar() {
 
-    /**
-     * Hides the search bar by animating it upwards off the scren
-     */
-    public void hideSearchBar(){
+        //Layout has not yet finished
+        if(mCardViewToolbarContainer.getHeight() == 0){
+            return;
+        }
 
         ObjectAnimator searchBarAnimation = ObjectAnimator
                 .ofFloat(
@@ -198,7 +201,12 @@ public class ContactSearchFragment extends Fragment implements LoaderManager.Loa
     /**
      * Displays the search bar by animating it downwards onto the screen
      */
-    public void showSearchBar(){
+    public void showSearchBar() {
+        //Layout has not yet finished
+        if(mCardViewToolbarContainer.getHeight() == 0){
+            return;
+        }
+
         ObjectAnimator searchBarAnimation = ObjectAnimator
                 .ofFloat(
                         mCardViewToolbarContainer,
@@ -223,73 +231,89 @@ public class ContactSearchFragment extends Fragment implements LoaderManager.Loa
 
     /**
      * Sets a callback which is invoked when a contact has been selected
+     *
      * @param onContactSelectedListener The callback to be invoked when a contact has been selected
      */
     public void setOnContactSelectedListener(ContactSearchAdapter.OnContactSelectedListener onContactSelectedListener) {
-        mOnContactSelectedListener = onContactSelectedListener;
+        mRecipientSelectedListener = onContactSelectedListener;
     }
 
     /**
      * Sets a callback which is invoked when the contact search list scroll state has changed
+     *
      * @param onScrollStateChangedListener The callback to be invoked when the scroll state changes
      */
-    public void setOnScrollStateChangedListener(OnScrollStateChangedListener onScrollStateChangedListener){
+    public void setOnScrollStateChangedListener(OnScrollStateChangedListener onScrollStateChangedListener) {
         mOnScrollStateChangedListener = onScrollStateChangedListener;
     }
 
+
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String whereQuery = "";
-        String[] whereParameters = null;
-
-        String whereTemplate =
-                " AND (replace(replace(%s, ' ', ''),'-', '') like ? OR " +
-                        " replace(replace(%s, ' ', ''),'-', '') like ? OR " +
-                        " %s like ? )";
-
-        if (!mQuery.isEmpty()) {
-            whereQuery = String.format(
-                    whereTemplate,
-                    ContactsContract.CommonDataKinds.Phone.NUMBER,
-                    ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER,
-                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY);
-
-            whereParameters = new String[]{"%" + mQuery + "%", "%" + mQuery + "%", "%" + mQuery + "%"};
-        }
-
-        return new CursorLoader(
-                getActivity(),
-                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                mContactColumns,
-                ContactsContract.CommonDataKinds.Phone.IN_VISIBLE_GROUP + " = 1 AND "
-                        + ContactsContract.CommonDataKinds.Phone.HAS_PHONE_NUMBER + " = " + 1
-                        + whereQuery,
-                whereParameters,
-                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY);
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        //Nothing to do
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(!doRunQuery()){
-            return;
-        }
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        //Nothing to do
+    }
 
-        //If the user has entered a valid phone number, add a "send message to" option for
-        //the user to select a non-contact phone number
-        if (PHONE_NUMBER_MATCHER.matcher(mQuery).matches()) {
+    @Override
+    public void afterTextChanged(Editable s) {
+        setQuery(s.toString());
+    }
+
+    /**
+     * Sets the query to perform the search on
+     *
+     * @param query The query to search
+     */
+    public void setQuery(String query) {
+        mQuery = query;
+
+        if (doRunQuery()) {
+            runSearch();
+        } else if (mContactsAdapter != null) {
             MatrixCursor matrixCursor = new MatrixCursor(mContactColumns);
-            Object[] row = new Object[]{
-                    -1,
-                    -1,
-                    getArguments().getString("rawSearchAction", getString(R.string.make_call_to_label)),
-                    mQuery,
-                    mQuery,
-                    null,
-                    null};
-            matrixCursor.addRow(row);
-            data = new MergeCursor(new Cursor[]{matrixCursor, data});
+            mContactsAdapter.swapCursor(matrixCursor);
         }
+    }
 
+    private void runSearch() {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+            getLoaderManager().restartLoader(0, null, new ContactSearchResultLoaderCallback());
+        } else {
+            displayPermissionRow();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        runSearch();
+    }
+
+    private void displayPermissionRow() {
+        MatrixCursor matrixCursor = new MatrixCursor(mContactColumns);
+        Object[] row = new Object[]{
+                ROW_ID_PERMISSIONS,
+                -1,
+                getString(R.string.error_missing_contacts_permission_search),
+                "",
+                getString(R.string.error_missing_contacts_permission_search_action),
+                null,
+                null};
+
+        matrixCursor.addRow(row);
+        initAdapter(matrixCursor);
+    }
+
+    private boolean doRunQuery() {
+        //Only run a database query if we have permission, the query is not empty, or flagged to run always
+        return (!mQuery.isEmpty() ||
+                !getArguments().getBoolean("displayOnlyOnSearch"));
+    }
+
+    private void initAdapter(Cursor data) {
         if (mContactsAdapter == null) {
             ContactThemeColorMatcher colorMatcher = new ContactThemeColorMatcher(
                     getContext(),
@@ -313,48 +337,6 @@ public class ContactSearchFragment extends Fragment implements LoaderManager.Loa
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        if (mContactsAdapter != null) {
-            mContactsAdapter.swapCursor(null);
-        }
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        //Nothing to do
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        //Nothing to do
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-        setQuery(s.toString());
-    }
-
-    /**
-     * Sets the query to perform the search on
-     * @param query The query to search
-     */
-    public void setQuery(String query) {
-        mQuery = query;
-
-        if (doRunQuery()) {
-            getLoaderManager().restartLoader(0, null, this);
-        } else if(mContactsAdapter != null){
-            MatrixCursor matrixCursor = new MatrixCursor(mContactColumns);
-            mContactsAdapter.swapCursor(matrixCursor);
-        }
-    }
-
-    private boolean doRunQuery() {
-        return !mQuery.isEmpty() ||
-                !getArguments().getBoolean("displayOnlyOnSearch");
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.reset(this);
@@ -367,7 +349,7 @@ public class ContactSearchFragment extends Fragment implements LoaderManager.Loa
 
         @Override
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-            if(mOnScrollStateChangedListener != null){
+            if (mOnScrollStateChangedListener != null) {
                 mOnScrollStateChangedListener.onStrollStateChanged(newState);
             }
 
@@ -380,17 +362,83 @@ public class ContactSearchFragment extends Fragment implements LoaderManager.Loa
     }
 
     /**
-     * A callback which is invoked when a contact is selected from the contact search list
+     * Callback loader responsible for loading data from a user query.
      */
-    public interface OnContactSelectedListener {
+    private class ContactSearchResultLoaderCallback implements LoaderManager.LoaderCallbacks<Cursor> {
 
         /**
-         * Invoked when a contact is selected from the contact search list
-         * @param contactLookupKey The contact lookup key
-         * @param recipient The name of the recipient that has been selected by the user
+         * Creates a new ContactSearchResultLoaderCallback instance.
          */
-        void onRecipientSelected(String contactLookupKey, String recipient);
+        @RequiresPermission(Manifest.permission.READ_CONTACTS)
+        public ContactSearchResultLoaderCallback(){
+            //Default constructor for permission checking
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            String whereQuery = "";
+            String[] whereParameters = null;
+
+            String whereTemplate =
+                    " AND (replace(replace(%s, ' ', ''),'-', '') like ? OR " +
+                            " replace(replace(%s, ' ', ''),'-', '') like ? OR " +
+                            " %s like ? )";
+
+            if (!mQuery.isEmpty()) {
+                whereQuery = String.format(
+                        whereTemplate,
+                        ContactsContract.CommonDataKinds.Phone.NUMBER,
+                        ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER,
+                        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY);
+
+                whereParameters = new String[]{"%" + mQuery + "%", "%" + mQuery + "%", "%" + mQuery + "%"};
+            }
+
+            return new CursorLoader(
+                    getActivity(),
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    mContactColumns,
+                    ContactsContract.CommonDataKinds.Phone.IN_VISIBLE_GROUP + " = 1 AND "
+                            + ContactsContract.CommonDataKinds.Phone.HAS_PHONE_NUMBER + " = " + 1
+                            + whereQuery,
+                    whereParameters,
+                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            if (!doRunQuery()) {
+                return;
+            }
+
+            //If the user has entered a valid phone number, add a "send message to" option for
+            //the user to select a non-contact phone number
+            if (PHONE_NUMBER_MATCHER.matcher(mQuery).matches()) {
+                MatrixCursor matrixCursor = new MatrixCursor(mContactColumns);
+                Object[] row = new Object[]{
+                        ROW_ID_FREE_SEARCH,
+                        -1,
+                        getArguments().getString("rawSearchAction", getString(R.string.make_call_to_label)),
+                        mQuery,
+                        mQuery,
+                        null,
+                        null};
+                matrixCursor.addRow(row);
+                data = new MergeCursor(new Cursor[]{matrixCursor, data});
+            }
+
+            initAdapter(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            if (mContactsAdapter != null) {
+                mContactsAdapter.swapCursor(null);
+            }
+        }
     }
+
+
 
     /**
      * An callback interface which is invoked when the scroll state of the contact search list
@@ -416,6 +464,7 @@ public class ContactSearchFragment extends Fragment implements LoaderManager.Loa
 
         /**
          * Invoked when the scroll satate of the contact search list changes
+         *
          * @param newState The new scroll state of the contact search lsit
          */
         void onStrollStateChanged(int newState);
