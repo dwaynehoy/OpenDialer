@@ -1,15 +1,12 @@
 package com.squizbit.opendialer.library.widget;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -19,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.squizbit.opendialer.R;
+import com.squizbit.opendialer.models.DialerHelper;
 import com.squizbit.opendialer.library.widget.BottomSheet.ViewBuilder;
 import com.squizbit.opendialer.models.Preferences;
 
@@ -33,10 +31,12 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
     private String mLookupId;
     private View mView;
     private ViewGroup mParent;
+    private DialerHelper mDialerHelper;
 
-    public ContactDetailViewBuilder(FragmentActivity owner, String lookupId) {
+    public ContactDetailViewBuilder(FragmentActivity owner, String lookupId, DialerHelper dialerHelper) {
         super(owner);
         mLookupId = lookupId;
+        mDialerHelper = dialerHelper;
     }
 
     @Override
@@ -118,18 +118,9 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
             public void onClick(View v) {
                 String number = (String) v.getTag();
                 Preferences preferences = new Preferences(getContext());
-                preferences.setLastDialedNumber(number);
-
-                Intent intent = new Intent(Intent.ACTION_CALL);
-                intent.setData(Uri.parse("tel:" + number));
-
-                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                    getContext().startActivity(intent);
-                    return;
-                } else {
-                    //TODO: Dialog explaining permission issue
+                if(!mDialerHelper.dialNumber(number)){
+                    preferences.setLastDialedNumber(number);
                 }
-
             }
         });
 
@@ -164,7 +155,18 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
 
     }
 
-    @Override
+    /**
+     * Callback which should be passed back by the parent activity in order, to handle the result of
+     * the permission request
+     *
+     * @param requestCode  The result code
+     * @param permissions  A permission array containing the permission
+     * @param grantResults The results array containing the permission results
+     */
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    }
+
+        @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         //Nothing to do here
     }

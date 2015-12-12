@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -94,6 +95,8 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Cont
             contactBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.img_contact_placeholder_medium);
             holder.imageViewContact.setBackgroundColor(mColorMatcher.getContactColor(mCursor.getString(mKeyIndex)));
         }
+
+        Log.e("TEST", "Contact " + mCursor.getString(mNameIndex) + "  Times Contacted: "+ mCursor.getString(6));
 
         holder.imageViewContact.setImageBitmap(contactBitmap);
         holder.textViewName.setText(mCursor.getString(mNameIndex));

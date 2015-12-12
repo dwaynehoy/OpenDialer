@@ -37,4 +37,11 @@
     <string name="starred_contact_desc">Contact is a favorite</string>
     <string name="frequent_contact_desc">Contact is a frequent contact</string>
 
+    <!--errors-->
+    <string name="error_missing_contacts_permission">This app needs permission to read contacts, click here to enable permission</string>
+    <string name="error_missing_contacts_permission_search">This feature needs permission to read contacts</string>
+    <string name="error_missing_contacts_permission_search_action">Click here to enable permission</string>
+
+    <string name="error_missing_call_log_permission">This app needs <b>call and contact permissions</b> in order to access your recent calls, click here to enable permission</string>
+
 </resources>
