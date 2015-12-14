@@ -22,7 +22,7 @@ android {
         applicationId "com.squizbit.opendialer"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 15
+        versionCode 16
         versionName "1.0.0." + getBuildNumber()
         renderscriptSupportModeEnabled true
 
