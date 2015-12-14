@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ab_primary">#009688</color>
+    <color name="ab_primary_dark">#00796B</color>
+    <color name="bg_window_light">#ffffff</color>
+
+    <!-- Buttons -->
+    <color name="num_pad_ripple">#32009688</color>
+    <color name="generic_ripple">#19000000</color>
+    <color name="divider">#20000000</color>
+    <drawable name="divider">@color/divider</drawable>
+    <color name="bg_accept_call">#53d769</color>
+    <color name="bg_window_dark">#e2dfdf</color>
+
+    <!--Fonts-->
+    <color name="subhead2">#636363</color>
+
+    <color name="incoming_call_status">#8DC63F</color>
+    <color name="outgoing_call_status">#00AEEF</color>
+    <color name="missed_call_status">#F6412C</color>
+    <color name="large_shadow_gradient_start">#20000000</color>
+    <color name="shadow_gradient_start">#30000000</color>
+    <color name="shadow_gradient_end">#00000000</color>
+    <color name="contact_red">#E55757</color>
+    <color name="contact_blue">#5784E5</color>
+    <color name="contact_purple">#D68CF9</color>
+    <color name="contact_yellow">#F7EE5D</color>
+    <color name="contact_green">#81E56C</color>
+</resources>

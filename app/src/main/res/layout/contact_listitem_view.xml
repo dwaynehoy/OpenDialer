@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/large_list_item_height"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:background="@drawable/bg_list_item">
+
+    <ImageView
+        android:id="@+id/imageViewContact"
+        android:layout_width="@dimen/contact_thumbnail"
+        android:layout_height="@dimen/contact_thumbnail"
+        android:background="@drawable/bg_round_template"
+        android:scaleType="centerInside"
+        android:src="@drawable/img_contact_placeholder_small"
+        android:contentDescription="@string/contact_image_desc"/>
+
+    <TextView
+        android:id="@+id/textViewName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/text_horizontal_margin"
+        android:layout_marginLeft="@dimen/text_horizontal_margin"
+        android:textAppearance="@style/TextAppearance.Subhead"
+        tools:text="Dwayne Hoy"/>
+
+</LinearLayout>

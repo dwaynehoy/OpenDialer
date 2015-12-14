@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="handle_normal">#4D4D4D</color>
+    <color name="bubble_index_text">#FFFFFF</color>
+
+    <dimen name="fastscroll_padding_right">8dp</dimen>
+    <dimen name="fastscroll_padding_top">16dp</dimen>
+    <dimen name="index_bubble_padding">16dp</dimen>
+    <dimen name="index_bubble_text">30dp</dimen>
+</resources>

@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.squizbit.opendialer.library.widget.ReverseShadowLinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/fab_spacing_vertical"
+    android:orientation="vertical"
+    tools:ignore="NestedWeights"
+    tools:layout_height="@dimen/dialer_height">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingTop="10dp">
+
+        <com.squizbit.opendialer.library.widget.AutoSizeTextView
+            android:id="@+id/editTextNumber"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="51dp"
+            android:layout_marginStart="51dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textAppearance="@style/TextAppearance.Dialer.Number"
+            android:textIsSelectable="true"/>
+
+        <ImageView
+            android:id="@+id/imageViewDeleteButton"
+            android:layout_width="@dimen/md_button_min_width"
+            android:layout_height="@dimen/md_button_height"
+            android:background="@drawable/bg_generic_action_button"
+            android:contentDescription="@string/back_button_desc"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_back_del"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_height"
+        android:layout_marginBottom="10dp"
+        android:background="@color/divider"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:layout_marginLeft="@dimen/key_horizontal_padding"
+        android:layout_marginRight="@dimen/key_horizontal_padding"
+        android:paddingLeft="@dimen/key_horizontal_padding"
+        android:paddingRight="@dimen/key_horizontal_padding">
+
+        <com.squizbit.opendialer.library.widget.DialLayout
+            android:id="@+id/numPadKeyOne"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_numpad_button"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/keypad_1"
+                android:textAppearance="@style/TextAppearance.Dialer.NumberItem"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/num_pad_text_offset"
+                android:gravity="center"
+                android:text=""
+                android:textAppearance="@style/TextAppearance.Dialer.Letters"/>
+        </com.squizbit.opendialer.library.widget.DialLayout>
+
+        <com.squizbit.opendialer.library.widget.DialLayout
+            android:id="@+id/numPadKeyTwo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_numpad_button"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/keypad_2"
+                android:textAppearance="@style/TextAppearance.Dialer.NumberItem"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/num_pad_text_offset"
+                android:gravity="center"
+                android:text="@string/keypad_2_letters"
+                android:textAppearance="@style/TextAppearance.Dialer.Letters"/>
+        </com.squizbit.opendialer.library.widget.DialLayout>
+
+        <com.squizbit.opendialer.library.widget.DialLayout
+            android:id="@+id/numPadKeyThree"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_numpad_button"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/keypad_3"
+                android:textAppearance="@style/TextAppearance.Dialer.NumberItem"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/num_pad_text_offset"
+                android:gravity="center"
+                android:text="@string/keypad_3_letters"
+                android:textAppearance="@style/TextAppearance.Dialer.Letters"/>
+        </com.squizbit.opendialer.library.widget.DialLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:layout_marginLeft="@dimen/key_horizontal_padding"
+        android:layout_marginRight="@dimen/key_horizontal_padding"
+        android:paddingLeft="@dimen/key_horizontal_padding"
+        android:paddingRight="@dimen/key_horizontal_padding">
+
+        <com.squizbit.opendialer.library.widget.DialLayout
+            android:id="@+id/numPadKeyFour"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_numpad_button"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/keypad_4"
+
+                android:textAppearance="@style/TextAppearance.Dialer.NumberItem"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/num_pad_text_offset"
+                android:gravity="center"
+                android:text="@string/keypad_4_letters"
+                android:textAppearance="@style/TextAppearance.Dialer.Letters"/>
+        </com.squizbit.opendialer.library.widget.DialLayout>
+
+        <com.squizbit.opendialer.library.widget.DialLayout
+            android:id="@+id/numPadKeyFive"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_numpad_button"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/keypad_5"
+
+                android:textAppearance="@style/TextAppearance.Dialer.NumberItem"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/num_pad_text_offset"
+                android:gravity="center"
+                android:text="@string/keypad_5_letters"
+                android:textAppearance="@style/TextAppearance.Dialer.Letters"/>
+        </com.squizbit.opendialer.library.widget.DialLayout>
+
+        <com.squizbit.opendialer.library.widget.DialLayout
+            android:id="@+id/numPadKeySix"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_numpad_button"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/keypad_6"
+                android:textAppearance="@style/TextAppearance.Dialer.NumberItem"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/num_pad_text_offset"
+                android:gravity="center"
+                android:text="@string/keypad_6_letters"
+                android:textAppearance="@style/TextAppearance.Dialer.Letters"/>
+        </com.squizbit.opendialer.library.widget.DialLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:layout_marginLeft="@dimen/key_horizontal_padding"
+        android:layout_marginRight="@dimen/key_horizontal_padding"
+        android:paddingLeft="@dimen/key_horizontal_padding"
+        android:paddingRight="@dimen/key_horizontal_padding">
+
+        <com.squizbit.opendialer.library.widget.DialLayout
+            android:id="@+id/numPadKeySeven"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_numpad_button"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/keypad_7"
+
+                android:textAppearance="@style/TextAppearance.Dialer.NumberItem"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/num_pad_text_offset"
+                android:gravity="center"
+                android:text="@string/keypad_7_letters"
+                android:textAppearance="@style/TextAppearance.Dialer.Letters"/>
+        </com.squizbit.opendialer.library.widget.DialLayout>
+
+        <com.squizbit.opendialer.library.widget.DialLayout
+            android:id="@+id/numPadKeyEight"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_numpad_button"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/keypad_8"
+
+                android:textAppearance="@style/TextAppearance.Dialer.NumberItem"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/num_pad_text_offset"
+                android:gravity="center"
+                android:text="@string/keypad_8_letters"
+                android:textAppearance="@style/TextAppearance.Dialer.Letters"/>
+        </com.squizbit.opendialer.library.widget.DialLayout>
+
+        <com.squizbit.opendialer.library.widget.DialLayout
+            android:id="@+id/numPadKeyNine"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_numpad_button"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/keypad_9"
+
+                android:textAppearance="@style/TextAppearance.Dialer.NumberItem"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/num_pad_text_offset"
+                android:gravity="center"
+                android:text="@string/keypad_9_letters"
+                android:textAppearance="@style/TextAppearance.Dialer.Letters"/>
+        </com.squizbit.opendialer.library.widget.DialLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:layout_marginLeft="@dimen/key_horizontal_padding"
+        android:layout_marginRight="@dimen/key_horizontal_padding"
+        android:paddingLeft="@dimen/key_horizontal_padding"
+        android:paddingRight="@dimen/key_horizontal_padding">
+
+        <com.squizbit.opendialer.library.widget.DialLayout
+            android:id="@+id/numPadKeyStar"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_numpad_button"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/keypad_star"
+                android:textAppearance="@style/TextAppearance.Dialer.NumberItem"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text=""
+                android:textAppearance="@style/TextAppearance.Dialer.Letters"/>
+        </com.squizbit.opendialer.library.widget.DialLayout>
+
+        <com.squizbit.opendialer.library.widget.DialLayout
+            android:id="@+id/numPadKeyZero"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_numpad_button"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/keypad_0"
+
+                android:textAppearance="@style/TextAppearance.Dialer.NumberItem"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/num_pad_text_offset"
+                android:gravity="center"
+                android:text="@string/keypad_0_letters"
+                android:textAppearance="@style/TextAppearance.Dialer.Letters"/>
+        </com.squizbit.opendialer.library.widget.DialLayout>
+
+        <com.squizbit.opendialer.library.widget.DialLayout
+            android:id="@+id/numPadKeyHash"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_numpad_button"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/keypad_hash"
+
+                android:textAppearance="@style/TextAppearance.Dialer.NumberItem"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text=""
+                android:textAppearance="@style/TextAppearance.Dialer.Letters"/>
+        </com.squizbit.opendialer.library.widget.DialLayout>
+    </LinearLayout>
+</com.squizbit.opendialer.library.widget.ReverseShadowLinearLayout>

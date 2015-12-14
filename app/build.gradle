@@ -1,0 +1,143 @@
+apply plugin: 'com.android.application'
+
+
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '23.0.2'
+
+    lintOptions {
+        // IMPORTANT: We are disabling this rule to avoid build errors on PrettyTime. Although
+        //pretty time references an InvalidPackage it does not do it in the code sections we use.
+        //Given how easy this library is to use I would prefer not to replace it with something
+        //like Joda-Time which is overkill for such a small section of the app.
+        disable 'InvalidPackage'
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+    }
+
+    defaultConfig {
+        applicationId "com.squizbit.opendialer"
+        minSdkVersion 16
+        targetSdkVersion 23
+        versionCode 15
+        versionName "1.0.0." + getBuildNumber()
+        renderscriptSupportModeEnabled true
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        if(System.getenv("OPENDIALER_PROD_KEYSTORE") != null) {
+            production {
+                storeFile file(System.getenv("OPENDIALER_PROD_KEYSTORE"))
+                storePassword System.getenv("OPENDIALER_PROD_KEYSTORE_PW")
+                keyAlias System.getenv("OPENDIALER_PROD_CERT")
+                keyPassword System.getenv("OPENDIALER_PROD_CERT_PW")
+            }
+        } else {
+            production {
+                //This key allows testing of product buildtype code without providing access to
+                //the real production key
+                storeFile file("keystore.jks")
+                storePassword "keystore"
+                keyAlias "pseudoprod"
+                keyPassword "pseudoprodcert"
+            }
+        }
+
+        debug {
+            storeFile file("keystore.jks")
+            storePassword "keystore"
+            keyAlias "debug"
+            keyPassword "debugcert"
+        }
+
+        staging {
+            storeFile file("keystore.jks")
+            storePassword "keystore"
+            keyAlias "staging"
+            keyPassword "stagingcert"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.production
+        }
+
+        debug {
+            minifyEnabled false
+            debuggable true
+            applicationIdSuffix ".debug"
+            signingConfig signingConfigs.debug
+        }
+
+        internal_test {
+            minifyEnabled false
+            debuggable true
+            applicationIdSuffix ".test"
+            signingConfig signingConfigs.debug
+        }
+
+        staging {
+            minifyEnabled false
+            debuggable false
+            applicationIdSuffix ".staging"
+            signingConfig signingConfigs.staging
+        }
+    }
+
+}
+
+def getBuildNumber() {
+    def buildString = System.getenv()['BUILD_NUMBER']
+    if (buildString == null) {
+        def date = new Date()
+        def formattedDate = date.format('yyyyMMddHHmm')
+        buildString = formattedDate
+    }
+
+    return buildString;
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    androidTestCompile('com.android.support.test:runner:0.3') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestCompile('com.android.support.test:rules:0.3') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestCompile('com.android.support.test.espresso:espresso-intents:2.2') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.2') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+    }
+    androidTestCompile('com.android.support.test.espresso:espresso-web:2.2') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:cardview-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
+    compile 'com.android.support:recyclerview-v7:23.1.1'
+    compile 'com.google.android.gms:play-services-gcm:8.3.0'
+    compile 'com.jakewharton:butterknife:6.1.0'
+    compile 'com.googlecode.libphonenumber:libphonenumber:3.1'
+    compile 'com.mcxiaoke.volley:library:1.0.15'
+    compile 'squizbit.com.jsonobjectified:jetjson:1.0.3@aar'
+    compile 'com.google.android.gms:play-services-analytics:8.3.0'
+}

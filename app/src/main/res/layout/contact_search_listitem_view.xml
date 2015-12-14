@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/large_list_item_height"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/bg_list_item"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin">
+
+    <ImageView
+        android:id="@+id/imageViewContact"
+        android:layout_width="@dimen/contact_thumbnail"
+        android:layout_height="@dimen/contact_thumbnail"
+        android:scaleType="centerInside"
+        android:contentDescription="@string/contact_image_desc"
+        android:src="@drawable/img_contact_placeholder_small"/>
+
+    <LinearLayout
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textViewName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/text_horizontal_margin"
+            android:layout_marginStart="@dimen/text_horizontal_margin"
+            android:textAppearance="@style/TextAppearance.Subhead"
+            tools:text="Dwayne Hoy"/>
+        <TextView
+            android:id="@+id/textViewNumber"
+            android:layout_marginTop="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/text_horizontal_margin"
+            android:layout_marginStart="@dimen/text_horizontal_margin"
+            android:textAppearance="@style/TextAppearance.Body1"
+            tools:text="+6418204586"/>
+    </LinearLayout>
+
+</LinearLayout>

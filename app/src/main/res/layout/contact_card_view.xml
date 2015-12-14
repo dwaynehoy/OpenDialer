@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:minWidth="150dp"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/imageViewContact"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/small_card_height"
+            android:contentDescription="@string/contact_image_desc"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img_contact_placeholder_medium"/>
+
+        <TextView
+            android:id="@+id/textViewName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/imageViewContact"
+            android:background="@drawable/bg_overlay_text_gradient"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:textAppearance="@style/TextAppearance.Subhead.Inverse"
+            tools:text="Dwayne Hoy"/>
+
+        <ImageView
+            android:id="@+id/imageViewStarred"
+            android:src="@drawable/ic_star_unselected"
+            android:layout_width="@dimen/star_touch_area"
+            android:layout_height="@dimen/star_touch_area"
+            android:scaleType="centerInside"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignBottom="@+id/textViewName"
+            tools:ignore="ContentDescription"/>
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="provider_authority">co.strone.opendialer.test.cache</string>
+    <string name="authenticator_account_type">co.strone.account.test</string>
+    <string name="app_authenticator_name">Strone Test</string>
+</resources>
