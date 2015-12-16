@@ -2,7 +2,7 @@ package com.squizbit.opendialer.data;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -97,7 +97,7 @@ public abstract class ContactLookupAdapter<T extends RecyclerView.ViewHolder> ex
      */
     @Nullable
     protected Contact getContact(String number){
-        if(ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_CONTACTS) != PackageInfo.REQUESTED_PERMISSION_GRANTED){
+        if(ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_DENIED){
             return null;
         }
 
