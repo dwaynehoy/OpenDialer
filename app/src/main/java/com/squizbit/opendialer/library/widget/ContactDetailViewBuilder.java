@@ -1,23 +1,31 @@
 package com.squizbit.opendialer.library.widget;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v7.graphics.Palette;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squizbit.opendialer.R;
-import com.squizbit.opendialer.models.DialerHelper;
 import com.squizbit.opendialer.library.widget.BottomSheet.ViewBuilder;
+import com.squizbit.opendialer.models.ContactColorGenerator;
+import com.squizbit.opendialer.models.DialerHelper;
 import com.squizbit.opendialer.models.Preferences;
 
 import java.io.FileNotFoundException;
@@ -32,11 +40,46 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
     private View mView;
     private ViewGroup mParent;
     private DialerHelper mDialerHelper;
+    Preferences mPreferences;
+
+
+    private View.OnClickListener mOnNumberClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String number = (String) v.getTag();
+
+            if (!mDialerHelper.dialNumber(number)) {
+                mPreferences.setLastDialedNumber(number);
+            }
+        }
+    };
+
+    private View.OnClickListener mOnEmailClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String email = (String) v.getTag();
+
+            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto",email, null));
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, email);
+            getContext().startActivity(emailIntent);
+        }
+    };
+
+    private View.OnClickListener mOnWebLinkClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String url = (String) v.getTag();
+
+            Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            getContext().startActivity(webIntent);
+        }
+    };
 
     public ContactDetailViewBuilder(FragmentActivity owner, String lookupId, DialerHelper dialerHelper) {
         super(owner);
         mLookupId = lookupId;
         mDialerHelper = dialerHelper;
+        mPreferences = new Preferences(getContext());
     }
 
     @Override
@@ -51,7 +94,7 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, mLookupId);
-        uri = uri.withAppendedPath(uri, ContactsContract.Contacts.Entity.CONTENT_DIRECTORY);
+        uri = Uri.withAppendedPath(uri, ContactsContract.Contacts.Entity.CONTENT_DIRECTORY);
 
         return new CursorLoader(
                 getContext(),
@@ -65,7 +108,7 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         String displayImage = null;
-        String phoneNumber = null;
+        String colorKey = null;
 
         if (data.moveToFirst()) {
             do {
@@ -73,7 +116,8 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
 
                 if (displayImage == null && mimeType.equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)) {
                     displayImage = data.getString(data.getColumnIndex(ContactsContract.CommonDataKinds.Photo.PHOTO_URI));
-                } else if (phoneNumber == null && mimeType.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
+                    colorKey = data.getString(data.getColumnIndex(ContactsContract.CommonDataKinds.Photo.LOOKUP_KEY));
+                } else if (mimeType.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
                     insertPhoneNumber(
                             data.getInt(data.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)),
                             data.getString(data.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)),
@@ -82,15 +126,37 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
                             data.getInt(data.getColumnIndex(ContactsContract.CommonDataKinds.Phone.IS_PRIMARY)) == 1
                     );
 
+                } else if (mimeType.equals(ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)) {
+                    insertEmail(data.getString(data.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS)));
+                } else if (mimeType.equals(ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE)) {
+                    insertWebPage(data.getString(data.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS)));
                 }
-
-
             } while (data.moveToNext());
 
             Bitmap contactBitmap = getContactImage(displayImage, Math.min(mParent.getWidth(), 720));
+
+            int color = - 1;
             if (contactBitmap != null) {
-                ((android.widget.ImageView) mView.findViewById(R.id.imageViewContact)).setImageBitmap(contactBitmap);
+                ((ImageView) mView.findViewById(R.id.imageViewContact)).setImageBitmap(contactBitmap);
+                Palette bitmapPallet = Palette.from(contactBitmap).generate();
+                color = bitmapPallet.getDarkVibrantColor(-1);
+                if(color == -1){
+                    color = bitmapPallet.getLightMutedColor(-1);
+                }
+            } else {
+                ContactColorGenerator generator = new ContactColorGenerator(
+                        getContext(),
+                        R.color.contact_red,
+                        R.color.contact_blue,
+                        R.color.contact_purple,
+                        R.color.contact_yellow,
+                        R.color.contact_green);
+                color = generator.getContactColor(colorKey);
+
+                mView.findViewById(R.id.imageViewContact).setBackgroundColor(color);
             }
+
+            addSectionIcons(color);
         }
     }
 
@@ -113,30 +179,82 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
         ((TextView) view.findViewById(R.id.textViewItem)).setText(number);
         ((TextView) view.findViewById(R.id.textViewType)).setText(type);
 
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String number = (String) v.getTag();
-                Preferences preferences = new Preferences(getContext());
-                if(!mDialerHelper.dialNumber(number)){
-                    preferences.setLastDialedNumber(number);
-                }
-            }
-        });
+        view.setOnClickListener(mOnNumberClickListener);
 
-        if(isPrimary){
-            parent.addView(view, 0);
-            if(parent.getChildCount() > 1){
-                parent.getChildAt(1).findViewById(R.id.imageViewType).setVisibility(View.INVISIBLE);
-            }
-        } else {
-            parent.addView(view);
-            if(parent.getChildCount() > 1){
-                view.findViewById(R.id.imageViewType).setVisibility(View.INVISIBLE);
-            }
-        }
+        parent.addView(view);
     }
 
+    private void insertEmail(String email) {
+        ViewGroup parent = (ViewGroup) mView.findViewById(R.id.linearLayoutEmailContainer);
+
+        View view = getLayoutInflater().inflate(R.layout.contact_detail_item_view, parent, false);
+        view.setTag(email);
+        view.setOnClickListener(mOnEmailClickListener);
+
+        ((TextView) view.findViewById(R.id.textViewItem)).setText(email);
+
+        parent.addView(view);
+    }
+
+    private void insertWebPage(String url) {
+        mView.findViewById(R.id.cardViewContactWebpage).setVisibility(View.VISIBLE);
+        ViewGroup parent = (ViewGroup) mView.findViewById(R.id.linearLayoutWebpageContainer);
+
+        View view = getLayoutInflater().inflate(R.layout.contact_detail_item_view, parent, false);
+        view.setTag(url);
+        view.setOnClickListener(mOnWebLinkClick);
+
+        ((TextView) view.findViewById(R.id.textViewItem)).setText(url);
+
+        parent.addView(view);
+    }
+
+    private void addSectionIcons(@ColorInt int color){
+        ViewGroup sectionContainer = (ViewGroup)mView.findViewById(R.id.linearLayoutNumberContainer);
+        if(sectionContainer.getChildCount() > 0){
+            Drawable drawable = ResourcesCompat.getDrawable(
+                    getContext().getResources(),
+                    R.drawable.ic_call_tintable,
+                    getContext().getTheme());
+            if(drawable != null){
+                drawable = drawable.mutate();
+                drawable = DrawableCompat.wrap(drawable);
+                DrawableCompat.setTint(drawable, color);
+            }
+
+            ((ImageView)sectionContainer.getChildAt(0).findViewById(R.id.imageViewType)).setImageDrawable(drawable);
+        }
+
+        sectionContainer = (ViewGroup)mView.findViewById(R.id.linearLayoutEmailContainer);
+        if(sectionContainer.getChildCount() > 0){
+            Drawable drawable = ResourcesCompat.getDrawable(
+                    getContext().getResources(),
+                    R.drawable.ic_email_tintable,
+                    getContext().getTheme());
+            if(drawable != null){
+                drawable = drawable.mutate();
+                drawable = DrawableCompat.wrap(drawable);
+                DrawableCompat.setTint(drawable, color);
+            }
+
+            ((ImageView)sectionContainer.getChildAt(0).findViewById(R.id.imageViewType)).setImageDrawable(drawable);
+        }
+
+        sectionContainer = (ViewGroup)mView.findViewById(R.id.linearLayoutWebpageContainer);
+        if(sectionContainer.getChildCount() > 0){
+            Drawable drawable = ResourcesCompat.getDrawable(
+                    getContext().getResources(),
+                    R.drawable.ic_web_tintable,
+                    getContext().getTheme());
+            if(drawable != null){
+                drawable = drawable.mutate();
+                drawable = DrawableCompat.wrap(drawable);
+                DrawableCompat.setTint(drawable, color);
+            }
+
+            ((ImageView)sectionContainer.getChildAt(0).findViewById(R.id.imageViewType)).setImageDrawable(drawable);
+        }
+    }
 
     private Bitmap getContactImage(String uriString, int dimen) {
         if (uriString == null || uriString.isEmpty()) {
@@ -166,7 +284,7 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
     }
 
-        @Override
+    @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         //Nothing to do here
     }

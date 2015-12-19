@@ -8,7 +8,7 @@ import android.widget.Scroller;
 /**
  * A slide helper class which helps in creating a start up slide animation for the bottomsheet library
  */
-public class BottomSheetSlideHelper {
+public class BottomSheetSlideAnimationHelper {
     private static final int SLIDE_DURATION = 300;
     private View mTargetView;
     private Scroller mScroller;
@@ -30,7 +30,7 @@ public class BottomSheetSlideHelper {
      * Creates a new BottomSheetSlide helper
      * @param context
      */
-    public BottomSheetSlideHelper(Context context){
+    public BottomSheetSlideAnimationHelper(Context context){
         mScroller = new Scroller(context, sInterpolator);
     }
 

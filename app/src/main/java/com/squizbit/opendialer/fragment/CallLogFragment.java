@@ -24,10 +24,10 @@ import android.widget.TextView;
 
 import com.squizbit.opendialer.R;
 import com.squizbit.opendialer.data.CallLogAdapter;
+import com.squizbit.opendialer.models.ContactColorGenerator;
 import com.squizbit.opendialer.models.DialerHelper;
 import com.squizbit.opendialer.library.widget.BottomSheet.BottomSheet;
 import com.squizbit.opendialer.library.widget.ContactDetailViewBuilder;
-import com.squizbit.opendialer.models.ContactThemeColorMatcher;
 import com.squizbit.opendialer.models.Preferences;
 
 import java.util.ArrayList;
@@ -206,7 +206,7 @@ public class CallLogFragment extends Fragment {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             if (mAdapter == null) {
-                ContactThemeColorMatcher colorMatcher = new ContactThemeColorMatcher(
+                ContactColorGenerator colorMatcher = new ContactColorGenerator(
                         getContext(),
                         R.color.contact_red,
                         R.color.contact_blue,

@@ -25,9 +25,9 @@ import android.widget.TextView;
 
 import com.squizbit.opendialer.R;
 import com.squizbit.opendialer.data.FavoritesAdapter;
+import com.squizbit.opendialer.models.ContactColorGenerator;
 import com.squizbit.opendialer.models.DialerHelper;
 import com.squizbit.opendialer.library.GridSpacingItemDecorator;
-import com.squizbit.opendialer.models.ContactThemeColorMatcher;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -173,7 +173,7 @@ public class FavoritesFragment extends Fragment {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             if (mContactsAdapter == null) {
-                ContactThemeColorMatcher colorMatcher = new ContactThemeColorMatcher(
+                ContactColorGenerator colorMatcher = new ContactColorGenerator(
                         getContext(),
                         R.color.contact_red,
                         R.color.contact_blue,
