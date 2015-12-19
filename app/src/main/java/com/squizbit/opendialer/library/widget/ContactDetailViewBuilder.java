@@ -116,7 +116,6 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
 
                 if (displayImage == null && mimeType.equals(ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)) {
                     displayImage = data.getString(data.getColumnIndex(ContactsContract.CommonDataKinds.Photo.PHOTO_URI));
-                    colorKey = data.getString(data.getColumnIndex(ContactsContract.CommonDataKinds.Photo.LOOKUP_KEY));
                 } else if (mimeType.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
                     insertPhoneNumber(
                             data.getInt(data.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE)),
@@ -151,7 +150,7 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
                         R.color.contact_purple,
                         R.color.contact_yellow,
                         R.color.contact_green);
-                color = generator.getContactColor(colorKey);
+                color = generator.getContactColor(mLookupId);
 
                 mView.findViewById(R.id.imageViewContact).setBackgroundColor(color);
             }
@@ -180,8 +179,12 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
         ((TextView) view.findViewById(R.id.textViewType)).setText(type);
 
         view.setOnClickListener(mOnNumberClickListener);
+        if(isPrimary){
+            parent.addView(view, 0);
+        } else {
+            parent.addView(view);
+        }
 
-        parent.addView(view);
     }
 
     private void insertEmail(String email) {
