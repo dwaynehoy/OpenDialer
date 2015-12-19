@@ -33,7 +33,7 @@ import android.widget.LinearLayout;
 import com.squizbit.opendialer.R;
 import com.squizbit.opendialer.data.ContactSearchAdapter;
 import com.squizbit.opendialer.library.widget.RecycleviewIndexer.RecyclerViewFastScroller;
-import com.squizbit.opendialer.models.ContactThemeColorMatcher;
+import com.squizbit.opendialer.models.ContactColorGenerator;
 
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -315,7 +315,7 @@ public class ContactSearchFragment extends Fragment implements TextWatcher {
 
     private void initAdapter(Cursor data) {
         if (mContactsAdapter == null) {
-            ContactThemeColorMatcher colorMatcher = new ContactThemeColorMatcher(
+            ContactColorGenerator colorMatcher = new ContactColorGenerator(
                     getContext(),
                     R.color.contact_red,
                     R.color.contact_blue,

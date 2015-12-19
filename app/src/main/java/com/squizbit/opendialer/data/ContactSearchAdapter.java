@@ -21,7 +21,7 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import com.squizbit.opendialer.R;
-import com.squizbit.opendialer.models.ContactThemeColorMatcher;
+import com.squizbit.opendialer.models.ContactColorGenerator;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class ContactSearchAdapter extends RecyclerView.Adapter<ContactSearchAdap
 
     private String  mDefaultCountryCode;
     private PhoneNumberUtil mPhoneNumberUtil;
-    private ContactThemeColorMatcher mColorMatcher;
+    private ContactColorGenerator mColorMatcher;
 
     private OnContactSelectedListener mContactSelectedListener;
 
@@ -53,7 +53,7 @@ public class ContactSearchAdapter extends RecyclerView.Adapter<ContactSearchAdap
      * @param cursor The cursor containing the contacts
      * @param defaultCountryCode The country code of the user's home country
      */
-    public ContactSearchAdapter(Context context, Cursor cursor, String defaultCountryCode, ContactThemeColorMatcher colorMatcher){
+    public ContactSearchAdapter(Context context, Cursor cursor, String defaultCountryCode, ContactColorGenerator colorMatcher){
         mContext = context;
         mCursor = cursor;
         mDefaultCountryCode = defaultCountryCode;
@@ -102,7 +102,7 @@ public class ContactSearchAdapter extends RecyclerView.Adapter<ContactSearchAdap
                 mContext.getResources().getDimensionPixelOffset(R.dimen.contact_thumbnail));
         if(contactBitmap == null) {
             contactBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.img_contact_placeholder_small);
-            holder.imageViewContact.setBackground(mColorMatcher.getCircularBackgroundDrawable(mCursor.getString(mKeyIndex)));
+            holder.imageViewContact.setBackground(mColorMatcher.getContactPlaceholderDrawable(mCursor.getString(mKeyIndex)));
         } else {
             holder.imageViewContact.setBackground(null);
         }

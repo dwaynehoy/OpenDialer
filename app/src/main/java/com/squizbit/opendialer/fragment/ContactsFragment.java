@@ -22,11 +22,11 @@ import android.widget.TextView;
 
 import com.squizbit.opendialer.R;
 import com.squizbit.opendialer.data.ContactsAdapter;
+import com.squizbit.opendialer.models.ContactColorGenerator;
 import com.squizbit.opendialer.models.DialerHelper;
 import com.squizbit.opendialer.library.widget.BottomSheet.BottomSheet;
 import com.squizbit.opendialer.library.widget.ContactDetailViewBuilder;
 import com.squizbit.opendialer.library.widget.RecycleviewIndexer.LinearManagerIndexerDecorator;
-import com.squizbit.opendialer.models.ContactThemeColorMatcher;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -142,7 +142,7 @@ public class ContactsFragment extends Fragment {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             if (mContactsAdapter == null) {
-                ContactThemeColorMatcher colorMatcher = new ContactThemeColorMatcher(
+                ContactColorGenerator colorMatcher = new ContactColorGenerator(
                         getContext(),
                         R.color.contact_red,
                         R.color.contact_blue,
