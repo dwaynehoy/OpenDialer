@@ -31,13 +31,6 @@
             android:textAppearance="@style/TextAppearance.Body1"
             tools:text="+61 418 204 586"/>
 
-        <TextView
-            android:id="@+id/textViewType"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:paddingTop="2dp"
-            tools:text="Mobile"/>
     </LinearLayout>
 
 

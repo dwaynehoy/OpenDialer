@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import com.squizbit.opendialer.R;
 import com.squizbit.opendialer.library.widget.RecycleviewIndexer.IndexedAdapter;
-import com.squizbit.opendialer.models.ContactThemeColorMatcher;
+import com.squizbit.opendialer.models.ContactColorGenerator;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,7 +32,7 @@ import butterknife.InjectView;
  */
 public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.ContactsViewHolder> implements OnClickListener, IndexedAdapter {
 
-    private final ContactThemeColorMatcher mColorMatcher;
+    private final ContactColorGenerator mColorMatcher;
     private Context mContext;
     private Cursor mCursor;
 
@@ -47,7 +47,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Cont
      * Creates a new Contacts Adapter which will be used to populate a recycle view
      * @param cursor The cursor containing the contacts
      */
-    public FavoritesAdapter(Context context, Cursor cursor, ContactThemeColorMatcher colorMatcher){
+    public FavoritesAdapter(Context context, Cursor cursor, ContactColorGenerator colorMatcher){
         mContext = context;
         mCursor = cursor;
         mColorMatcher = colorMatcher;

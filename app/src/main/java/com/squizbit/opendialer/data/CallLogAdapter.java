@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squizbit.opendialer.R;
-import com.squizbit.opendialer.models.ContactThemeColorMatcher;
+import com.squizbit.opendialer.models.ContactColorGenerator;
 import com.squizbit.opendialer.models.RelativeTimeFormat;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class CallLogAdapter extends ContactLookupAdapter<CallLogAdapter.CallLogV
     private ArrayList<Drawable> mStatusDrawableList;
     private OnCallLogEntryActionListener mOnCallLogEntryActionListener;
     private RelativeTimeFormat mRelativeTime;
-    private ContactThemeColorMatcher mColorMatcher;
+    private ContactColorGenerator mColorMatcher;
 
     public final View.OnClickListener mOnCallClickListener = new View.OnClickListener() {
         @Override
@@ -58,7 +58,7 @@ public class CallLogAdapter extends ContactLookupAdapter<CallLogAdapter.CallLogV
         }
     };
 
-    public CallLogAdapter(Context context, Cursor cursor, LoaderManager loaderManager, ContactThemeColorMatcher colorMatcher) {
+    public CallLogAdapter(Context context, Cursor cursor, LoaderManager loaderManager, ContactColorGenerator colorMatcher) {
         super(loaderManager, context);
         mContext = context;
         mCursor = cursor;
@@ -126,7 +126,7 @@ public class CallLogAdapter extends ContactLookupAdapter<CallLogAdapter.CallLogV
             holder.mImageViewContact.setBackground(null);
         } else if(contact != null){
             holder.mImageViewContact.setImageResource(R.drawable.img_contact_placeholder_small);
-            holder.mImageViewContact.setBackground(mColorMatcher.getCircularBackgroundDrawable(contact.getContactLookupKey()));
+            holder.mImageViewContact.setBackground(mColorMatcher.getContactPlaceholderDrawable(contact.getContactLookupKey()));
         } else {
             holder.mImageViewContact.setImageResource(R.drawable.img_contact_placeholder_small);
             holder.mImageViewContact.setBackground(null);

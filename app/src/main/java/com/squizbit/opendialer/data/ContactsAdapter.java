@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import com.squizbit.opendialer.R;
 import com.squizbit.opendialer.library.widget.RecycleviewIndexer.IndexedAdapter;
-import com.squizbit.opendialer.models.ContactThemeColorMatcher;
+import com.squizbit.opendialer.models.ContactColorGenerator;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -33,7 +33,7 @@ import butterknife.InjectView;
  */
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ContactsViewHolder> implements OnClickListener, IndexedAdapter {
 
-    private final ContactThemeColorMatcher mColorMatcher;
+    private final ContactColorGenerator mColorMatcher;
     private Context mContext;
     private Cursor mCursor;
     private int mNameIndex;
@@ -46,7 +46,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
      * Creates a new Contacts Adapter which will be used to populate a recycle view
      * @param cursor The cursor containing the contacts
      */
-    public ContactsAdapter(Context context, Cursor cursor, ContactThemeColorMatcher colorMatcher){
+    public ContactsAdapter(Context context, Cursor cursor, ContactColorGenerator colorMatcher){
         mContext = context;
         mCursor = cursor;
         mColorMatcher = colorMatcher;
@@ -91,7 +91,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
                 mContext.getResources().getDimensionPixelOffset(R.dimen.contact_thumbnail));
         if(contactBitmap == null) {
             contactBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.img_contact_placeholder_small);
-            holder.imageViewContact.setBackground(mColorMatcher.getCircularBackgroundDrawable(mCursor.getString(mKeyIndex)));
+            holder.imageViewContact.setBackground(mColorMatcher.getContactPlaceholderDrawable(mCursor.getString(mKeyIndex)));
         } else {
             holder.imageViewContact.setBackground(null);
         }
