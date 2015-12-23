@@ -5,28 +5,23 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.net.Uri;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.util.ArrayMap;
 import android.support.v4.util.LruCache;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
-import com.squizbit.opendialer.R;
+import com.squizbit.opendialer.models.ContactImage;
 
-import java.io.IOException;
 import java.util.Locale;
 
 /**
@@ -152,43 +147,13 @@ public abstract class ContactLookupAdapter<T extends RecyclerView.ViewHolder> ex
 
 
     @Nullable
-    protected RoundedBitmapDrawable getRoundedContactImage(Contact contact) {
-        Bitmap contactBitmap = null;
-        if(contact != null){
-            contactBitmap = getContactImage(
-                    contact.getPictureUri(),
-                    mContext.getResources().getDimensionPixelOffset(R.dimen.contact_thumbnail));
-        }
-
-        RoundedBitmapDrawable contactDrawable = null;
-        if (contactBitmap != null) {
-            contactDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), contactBitmap);
-            contactDrawable.setAntiAlias(true);
-            contactDrawable.setCornerRadius(mContext.getResources().getDimension(R.dimen.contact_corner_radius));
-        }
-
-        return contactDrawable;
-    }
-
-    private Bitmap getContactImage(String uriString, int dimen){
-        if(uriString == null || uriString.isEmpty()){
+    protected Drawable getRoundedContactImage(Contact contact, int dimen) {
+        if(contact == null){
             return null;
         }
 
-        Bitmap image = mImageCache.get(uriString+"?dimen=" + dimen);
-
-        if(image == null) {
-            try {
-                Uri uri = Uri.parse(uriString);
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), uri);
-                image = Bitmap.createScaledBitmap(bitmap, dimen, dimen, true);
-                mImageCache.put(uriString+"?dimen=" + dimen, image);
-            } catch (IOException e) {
-                Log.e("Strone", "Cound not retrieve contact image " + uriString, e);
-            }
-        }
-
-        return image;
+        ContactImage contactImage = new ContactImage(mContext, contact.getPictureUri());
+        return contactImage.getRoundContactDrawable(dimen);
     }
 
     @Override

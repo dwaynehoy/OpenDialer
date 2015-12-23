@@ -7,7 +7,6 @@ import android.provider.CallLog;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -120,7 +119,7 @@ public class CallLogAdapter extends ContactLookupAdapter<CallLogAdapter.CallLogV
         holder.mImageViewCall.setTag(number);
         holder.mImageViewCall.setOnClickListener(mOnCallClickListener);
 
-        Drawable contactDrawable = getRoundedContactImage(contact);
+        Drawable contactDrawable = getRoundedContactImage(contact, mContext.getResources().getDimensionPixelSize(R.dimen.contact_thumbnail));
         if(contactDrawable != null) {
             holder.mImageViewContact.setImageDrawable(contactDrawable);
             holder.mImageViewContact.setBackground(null);
@@ -151,7 +150,6 @@ public class CallLogAdapter extends ContactLookupAdapter<CallLogAdapter.CallLogV
             case 5: // Rejected call type isn't defined in contract.
                 return mStatusDrawableList.get(MISSED_OR_REJECTED_CALL_SYMBOL);
             default:
-                Log.e("TEST", "Call type " + type);
                 return null;
         }
     }

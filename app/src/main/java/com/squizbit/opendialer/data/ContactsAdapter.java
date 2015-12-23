@@ -4,11 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
+import android.graphics.drawable.Drawable;
 import android.provider.ContactsContract;
-import android.provider.MediaStore;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,9 +17,7 @@ import android.widget.TextView;
 import com.squizbit.opendialer.R;
 import com.squizbit.opendialer.library.widget.RecycleviewIndexer.IndexedAdapter;
 import com.squizbit.opendialer.models.ContactColorGenerator;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import com.squizbit.opendialer.models.ContactImage;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -85,21 +80,17 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
     @Override
     public void onBindViewHolder(ContactsViewHolder holder, int position) {
         mCursor.moveToPosition(position);
+        ContactImage contactImage = new ContactImage(mContext, mCursor.getString(mPhotoUriIndex));
+        Drawable contactDrawable = contactImage.getRoundContactDrawable(mContext.getResources().getDimensionPixelOffset(R.dimen.contact_thumbnail));
 
-        Bitmap contactBitmap = getContactImage(
-                mCursor.getString(mPhotoUriIndex),
-                mContext.getResources().getDimensionPixelOffset(R.dimen.contact_thumbnail));
-        if(contactBitmap == null) {
-            contactBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.img_contact_placeholder_small);
+        if(contactDrawable == null) {
+            Bitmap contactBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.img_contact_placeholder_small);
+            holder.imageViewContact.setImageBitmap(contactBitmap);
             holder.imageViewContact.setBackground(mColorMatcher.getContactPlaceholderDrawable(mCursor.getString(mKeyIndex)));
         } else {
+            holder.imageViewContact.setImageDrawable(contactDrawable);
             holder.imageViewContact.setBackground(null);
         }
-
-        RoundedBitmapDrawable contactDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), contactBitmap);
-        contactDrawable.setAntiAlias(true);
-        contactDrawable.setCornerRadius(mContext.getResources().getDimension(R.dimen.contact_corner_radius));
-        holder.imageViewContact.setImageDrawable(contactDrawable);
 
         holder.textViewName.setText(mCursor.getString(mNameIndex));
 
@@ -107,21 +98,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.Contac
         holder.itemView.setOnClickListener(this);
     }
 
-    private Bitmap getContactImage(String uriString, int dimen){
-        if(uriString == null || uriString.isEmpty()){
-            return null;
-        }
 
-        try {
-            Uri uri = Uri.parse(uriString);
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), uri);
-            return Bitmap.createScaledBitmap(bitmap, dimen, dimen, true);
-        } catch (FileNotFoundException e) {
-            return null;
-        } catch (IOException e) {
-            return null;
-        }
-    }
 
     @Override
     public void onClick(View v) {
