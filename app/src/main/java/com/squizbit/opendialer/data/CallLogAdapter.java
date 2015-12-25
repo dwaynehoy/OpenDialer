@@ -7,7 +7,6 @@ import android.provider.CallLog;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squizbit.opendialer.R;
-import com.squizbit.opendialer.models.ContactThemeColorMatcher;
+import com.squizbit.opendialer.models.ContactColorGenerator;
 import com.squizbit.opendialer.models.RelativeTimeFormat;
 
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ public class CallLogAdapter extends ContactLookupAdapter<CallLogAdapter.CallLogV
     private ArrayList<Drawable> mStatusDrawableList;
     private OnCallLogEntryActionListener mOnCallLogEntryActionListener;
     private RelativeTimeFormat mRelativeTime;
-    private ContactThemeColorMatcher mColorMatcher;
+    private ContactColorGenerator mColorMatcher;
 
     public final View.OnClickListener mOnCallClickListener = new View.OnClickListener() {
         @Override
@@ -58,7 +57,7 @@ public class CallLogAdapter extends ContactLookupAdapter<CallLogAdapter.CallLogV
         }
     };
 
-    public CallLogAdapter(Context context, Cursor cursor, LoaderManager loaderManager, ContactThemeColorMatcher colorMatcher) {
+    public CallLogAdapter(Context context, Cursor cursor, LoaderManager loaderManager, ContactColorGenerator colorMatcher) {
         super(loaderManager, context);
         mContext = context;
         mCursor = cursor;
@@ -120,13 +119,13 @@ public class CallLogAdapter extends ContactLookupAdapter<CallLogAdapter.CallLogV
         holder.mImageViewCall.setTag(number);
         holder.mImageViewCall.setOnClickListener(mOnCallClickListener);
 
-        Drawable contactDrawable = getRoundedContactImage(contact);
+        Drawable contactDrawable = getRoundedContactImage(contact, mContext.getResources().getDimensionPixelSize(R.dimen.contact_thumbnail));
         if(contactDrawable != null) {
             holder.mImageViewContact.setImageDrawable(contactDrawable);
             holder.mImageViewContact.setBackground(null);
         } else if(contact != null){
             holder.mImageViewContact.setImageResource(R.drawable.img_contact_placeholder_small);
-            holder.mImageViewContact.setBackground(mColorMatcher.getCircularBackgroundDrawable(contact.getContactLookupKey()));
+            holder.mImageViewContact.setBackground(mColorMatcher.getContactPlaceholderDrawable(contact.getContactLookupKey()));
         } else {
             holder.mImageViewContact.setImageResource(R.drawable.img_contact_placeholder_small);
             holder.mImageViewContact.setBackground(null);
@@ -151,7 +150,6 @@ public class CallLogAdapter extends ContactLookupAdapter<CallLogAdapter.CallLogV
             case 5: // Rejected call type isn't defined in contract.
                 return mStatusDrawableList.get(MISSED_OR_REJECTED_CALL_SYMBOL);
             default:
-                Log.e("TEST", "Call type " + type);
                 return null;
         }
     }

@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.support.v4.widget.ViewDragHelper.Callback;
@@ -12,8 +13,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ScrollView;
 
 import com.squizbit.opendialer.R;
 
@@ -26,12 +27,13 @@ public class BottomSheetView extends FrameLayout {
     private boolean mIsLoadingIn = true;
     private Drawable mNavDrawable;
     private ViewDragHelper mViewDragHelper;
-    private BottomSheetSlideHelper mViewSlideHelper;
-    private ViewGroup mBottomSheetView;
+    private BottomSheetSlideAnimationHelper mViewSlideHelper;
+    private ScrollView mBottomSheetView;
     private int mBottomSheetStartPosition = 0;
     private int mStatusBarHeight;
     private int mNavigationHeight;
     private OnBottomSheetDismissedListener mOnBottomSheetDismissedListener;
+    private float mLastInterceptYCoord;
 
     /**
      * Creates a new Bottom sheet slide view
@@ -52,35 +54,40 @@ public class BottomSheetView extends FrameLayout {
         super(context, attrs);
 
         mViewDragHelper = ViewDragHelper.create(this, new ViewDragCallback());
-        mViewSlideHelper = new BottomSheetSlideHelper(context);
+        mViewSlideHelper = new BottomSheetSlideAnimationHelper(context);
+        mShadowDrawable = ResourcesCompat.getDrawable(getResources(), R.drawable.bg_shadow, getContext().getTheme());
+        if (mShadowDrawable != null) {
+            mShadowDrawable.setAlpha(0);
+        }
 
-        mShadowDrawable = getResources().getDrawable(R.drawable.bg_shadow);
-        mShadowDrawable.setAlpha(0);
-
-        mNavDrawable = new ColorDrawable(getResources().getColor(android.R.color.black));
+        ResourcesCompat resourcesCompat = new ResourcesCompat();
+        mNavDrawable = new ColorDrawable(resourcesCompat.getColor(getResources(), android.R.color.black, getContext().getTheme()));
         mNavigationHeight = getNavigationBarHeight();
-        mStatusBarHeight = getResources().getDimensionPixelOffset(R.dimen.statusbar_height);
+        mStatusBarHeight = getStatusBarHeight();
 
         setWillNotDraw(false);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        mBottomSheetView = (ViewGroup) getChildAt(0);
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        mBottomSheetView = (ScrollView) getChildAt(0);
+        setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
+        mBottomSheetView.measure(
+                widthMeasureSpec,
+                getChildMeasureSpec(heightMeasureSpec, 0, MeasureSpec.getSize(heightMeasureSpec) - mStatusBarHeight - mNavigationHeight));
     }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         mBottomSheetStartPosition =
                 getMeasuredHeight() - getContext().getResources().getDimensionPixelOffset(R.dimen.bottomsheet_intial_visiblity);
-        getChildAt(0).layout(left, getMeasuredHeight() - mNavigationHeight, right, getMeasuredHeight() + getMeasuredHeight() - mNavigationHeight);
+        getChildAt(0).layout(left, getMeasuredHeight(), right, getMeasuredHeight() + mBottomSheetView.getMeasuredHeight());
     }
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
 
-        if(mIsLoadingIn){
+        if (mIsLoadingIn) {
             mViewSlideHelper.smoothSlideViewTo(mBottomSheetView, mBottomSheetStartPosition + mStatusBarHeight);
             ViewCompat.postInvalidateOnAnimation(BottomSheetView.this);
             mIsLoadingIn = false;
@@ -92,6 +99,7 @@ public class BottomSheetView extends FrameLayout {
         float shadowAlpha = 1 - (mBottomSheetView.getTop() / (float) getHeight());
         mShadowDrawable.setAlpha((int) (shadowAlpha * 255));
         mShadowDrawable.draw(canvas);
+        //Draw navigation blackout bar
         mNavDrawable.setBounds(0, getHeight() - mNavigationHeight, getWidth(), getHeight());
         mNavDrawable.draw(canvas);
 
@@ -100,32 +108,48 @@ public class BottomSheetView extends FrameLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return mViewDragHelper.shouldInterceptTouchEvent(ev);
+        if (!isViewLockedToTop()) {
+            return mViewDragHelper.shouldInterceptTouchEvent(ev);
+        }
+
+        //Also intercept if we are scrolling down and the scrollview is at the top
+        if(ev.getAction() == MotionEvent.ACTION_MOVE &&
+                ev.getY() > mLastInterceptYCoord &&
+                mBottomSheetView.getScrollY() == 0){
+            return mViewDragHelper.shouldInterceptTouchEvent(ev);
+        }
+
+        mLastInterceptYCoord = ev.getY();
+        return false;
     }
 
     /**
      * Determines if a motion event was outside the bottomsheet
+     *
      * @param event The motion event to test against
      * @return True if the motion event was outside the bottomsheet, false otherwise
      */
-    public boolean wasTouchEventOutsideBottomSheet(MotionEvent event){
-        return  event.getY() < mBottomSheetView.getTop();
+    public boolean wasTouchEventOutsideBottomSheet(MotionEvent event) {
+        return event.getY() < mBottomSheetView.getTop();
+    }
+
+    private boolean isViewLockedToTop() {
+        return getChildAt(0).getTop() == mStatusBarHeight;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        if(wasTouchEventOutsideBottomSheet(event)){
+        if (wasTouchEventOutsideBottomSheet(event)) {
             return false;
         }
 
         if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
             mViewDragHelper.processTouchEvent(event);
             return false;
-        } else {
-            mViewDragHelper.processTouchEvent(event);
         }
 
+        mViewDragHelper.processTouchEvent(event);
         return true;
     }
 
@@ -140,8 +164,8 @@ public class BottomSheetView extends FrameLayout {
         }
 
 
-        if(!mViewSlideHelper.isAnimating() && !mIsLoadingIn && mBottomSheetView.getTop() >= getHeight() - mNavigationHeight){
-            if(mOnBottomSheetDismissedListener != null){
+        if (!mViewSlideHelper.isAnimating() && !mIsLoadingIn && mBottomSheetView.getTop() >= getHeight() - mNavigationHeight) {
+            if (mOnBottomSheetDismissedListener != null) {
                 mOnBottomSheetDismissedListener.onBottomSheetDismissed();
             }
         }
@@ -155,12 +179,7 @@ public class BottomSheetView extends FrameLayout {
         boolean hasNavigationBarHeight;
 
         int id = getResources().getIdentifier("config_showNavigationBar", "bool", "android");
-        if (id > 0) {
-            hasNavigationBarHeight = getResources().getBoolean(id);
-        }
-        else {
-            hasNavigationBarHeight = false;
-        }
+        hasNavigationBarHeight = id > 0 && getResources().getBoolean(id);
 
         int orientation = getResources().getConfiguration().orientation;
 
@@ -175,7 +194,16 @@ public class BottomSheetView extends FrameLayout {
         }
     }
 
-    private void snapToTop(){
+    private int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    private void snapToTop() {
         boolean smoothScroll = mViewDragHelper.smoothSlideViewTo(
                 mBottomSheetView,
                 0,
@@ -187,7 +215,7 @@ public class BottomSheetView extends FrameLayout {
         }
     }
 
-    private void snapToBottom(){
+    private void snapToBottom() {
         boolean smoothScroll = mViewDragHelper.smoothSlideViewTo(
                 mBottomSheetView,
                 0,
@@ -224,7 +252,7 @@ public class BottomSheetView extends FrameLayout {
 
         @Override
         public void onViewReleased(View releasedChild, float xvel, float yvel) {
-            if(yvel < 0) {
+            if (yvel < 0) {
                 snapToTop();
             } else if (yvel > 0) {
                 snapToBottom();

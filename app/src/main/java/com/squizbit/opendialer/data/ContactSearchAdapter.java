@@ -4,11 +4,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +20,8 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import com.squizbit.opendialer.R;
-import com.squizbit.opendialer.models.ContactThemeColorMatcher;
+import com.squizbit.opendialer.models.ContactColorGenerator;
+import com.squizbit.opendialer.models.ContactImage;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class ContactSearchAdapter extends RecyclerView.Adapter<ContactSearchAdap
 
     private String  mDefaultCountryCode;
     private PhoneNumberUtil mPhoneNumberUtil;
-    private ContactThemeColorMatcher mColorMatcher;
+    private ContactColorGenerator mColorMatcher;
 
     private OnContactSelectedListener mContactSelectedListener;
 
@@ -53,7 +53,7 @@ public class ContactSearchAdapter extends RecyclerView.Adapter<ContactSearchAdap
      * @param cursor The cursor containing the contacts
      * @param defaultCountryCode The country code of the user's home country
      */
-    public ContactSearchAdapter(Context context, Cursor cursor, String defaultCountryCode, ContactThemeColorMatcher colorMatcher){
+    public ContactSearchAdapter(Context context, Cursor cursor, String defaultCountryCode, ContactColorGenerator colorMatcher){
         mContext = context;
         mCursor = cursor;
         mDefaultCountryCode = defaultCountryCode;
@@ -97,20 +97,17 @@ public class ContactSearchAdapter extends RecyclerView.Adapter<ContactSearchAdap
     public void onBindViewHolder(ContactsSearchViewHolder holder, int position) {
         mCursor.moveToPosition(position);
 
-        Bitmap contactBitmap = getContactImage(
-                mCursor.getString(mPhotoUriIndex),
-                mContext.getResources().getDimensionPixelOffset(R.dimen.contact_thumbnail));
-        if(contactBitmap == null) {
-            contactBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.img_contact_placeholder_small);
-            holder.imageViewContact.setBackground(mColorMatcher.getCircularBackgroundDrawable(mCursor.getString(mKeyIndex)));
+        ContactImage contactImage = new ContactImage(mContext, mCursor.getString(mPhotoUriIndex));
+        Drawable contactDrawable = contactImage.getRoundContactDrawable(mContext.getResources().getDimensionPixelOffset(R.dimen.contact_thumbnail));
+
+        if(contactDrawable == null) {
+            Bitmap contactBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.img_contact_placeholder_small);
+            holder.imageViewContact.setImageBitmap(contactBitmap);
+            holder.imageViewContact.setBackground(mColorMatcher.getContactPlaceholderDrawable(mCursor.getString(mKeyIndex)));
         } else {
+            holder.imageViewContact.setImageDrawable(contactDrawable);
             holder.imageViewContact.setBackground(null);
         }
-
-        RoundedBitmapDrawable contactDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), contactBitmap);
-        contactDrawable.setAntiAlias(true);
-        contactDrawable.setCornerRadius(mContext.getResources().getDimension(R.dimen.contact_corner_radius));
-        holder.imageViewContact.setImageDrawable(contactDrawable);
 
         holder.textViewName.setText(mCursor.getString(mNameIndex));
         holder.textViewNumber.setText(formatNumber(mCursor.getString(mNumberIndex)));

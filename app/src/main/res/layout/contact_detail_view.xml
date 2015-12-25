@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/linearLayoutRoot"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_window_dark"
     android:orientation="vertical"
-    tools:showIn="@layout/contact_detail_view"
     tools:ignore="Overdraw">
 
     <ImageView
@@ -19,25 +18,58 @@
         android:src="@drawable/img_contact_placeholder_medium"/>
 
     <android.support.v7.widget.CardView
-        android:id="@+id/cardViewContactDetails"
+        android:id="@+id/cardViewContactNumbers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/half_card_margin"
         android:layout_marginRight="@dimen/half_card_margin"
         android:layout_marginTop="@dimen/half_card_margin"
+        android:layout_marginBottom="@dimen/half_card_margin"
         android:paddingLeft="@dimen/card_vertical_padding"
         android:paddingRight="@dimen/card_vertical_padding">
 
         <LinearLayout
+            android:id="@+id/linearLayoutNumberContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/linearLayoutNumberContainer">
+            android:orientation="vertical"/>
 
-
-        </LinearLayout>
     </android.support.v7.widget.CardView>
 
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardViewContactEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/half_card_margin"
+        android:layout_marginRight="@dimen/half_card_margin"
+        android:layout_marginBottom="@dimen/half_card_margin"
+        android:paddingLeft="@dimen/card_vertical_padding"
+        android:paddingRight="@dimen/card_vertical_padding">
 
+        <LinearLayout
+            android:id="@+id/linearLayoutEmailContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
 
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardViewContactWebpage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/half_card_margin"
+        android:layout_marginLeft="@dimen/half_card_margin"
+        android:layout_marginRight="@dimen/half_card_margin"
+        android:paddingLeft="@dimen/card_vertical_padding"
+        android:paddingRight="@dimen/card_vertical_padding"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/linearLayoutWebpageContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+
+    </android.support.v7.widget.CardView>
 </LinearLayout>
