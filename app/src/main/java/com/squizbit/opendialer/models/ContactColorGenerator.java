@@ -7,7 +7,6 @@ import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.v4.content.res.ResourcesCompat;
-import android.util.Log;
 
 import com.squizbit.opendialer.R;
 
@@ -41,11 +40,8 @@ public class ContactColorGenerator {
             colorIndex += (int)contactKey.charAt(i);
         }
 
-        Log.e("TEST", ""+colorIndex);
-
         for(int i = mColorArray.length - 1; i >= 0 ; i--){
             if(colorIndex % mPrimes[i] == 0){
-                Log.e("TEST", "PRIME: " + mPrimes[i]);
                 return resourcesCompat.getColor(mContext.getResources(), mColorArray[i], mContext.getTheme());
             }
         }
