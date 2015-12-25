@@ -1,13 +1,13 @@
 package com.squizbit.opendialer.fragment;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -17,7 +17,6 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,9 +24,9 @@ import android.widget.TextView;
 
 import com.squizbit.opendialer.R;
 import com.squizbit.opendialer.data.FavoritesAdapter;
+import com.squizbit.opendialer.library.GridSpacingItemDecorator;
 import com.squizbit.opendialer.models.ContactColorGenerator;
 import com.squizbit.opendialer.models.DialerHelper;
-import com.squizbit.opendialer.library.GridSpacingItemDecorator;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -52,29 +51,13 @@ public class FavoritesFragment extends Fragment {
     private FavoritesAdapter.OnContactSelectedListener mOnContactSelectedListener = new FavoritesAdapter.OnContactSelectedListener() {
         @Override
         public void onContactSelected(Cursor contact) {
-            Intent intent = new Intent(Intent.ACTION_CALL);
-            //TODO: Get number. If has default number, dial it. If not display contact card
             int lookupIndex = contact.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY);
             String lookupKey = contact.getString(lookupIndex);
-            Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
-            uri = uri.withAppendedPath(uri, ContactsContract.Contacts.Entity.CONTENT_DIRECTORY);
-
-            Cursor cursor = getContext().getContentResolver().query(
-                    uri,
-                    new String[]{ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER},
-                    ContactsContract.Contacts.Entity.MIMETYPE + " = ? ",
-                    new String[]{ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE},
-                    null);
-
-            if (cursor.moveToFirst()) {
-                int columnIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER);
-                Log.e("TEST", cursor.getString(columnIndex));
-                mDialerHelper.dialNumber(cursor.getString(columnIndex));
-            }
-
-            cursor.close();
+            String number = getDefaultNumber(lookupKey);
+            mDialerHelper.dialNumber(number);
         }
     };
+
     private View.OnClickListener mOnPermissionClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -122,6 +105,31 @@ public class FavoritesFragment extends Fragment {
                     null);
             mTextViewErrorMessage.setOnClickListener(mOnPermissionClickListener);
         }
+    }
+
+    @Nullable
+    private String getDefaultNumber(String lookupKey) {
+        Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
+        uri = Uri.withAppendedPath(uri, ContactsContract.Contacts.Entity.CONTENT_DIRECTORY);
+
+        Cursor cursor = getContext().getContentResolver().query(
+                uri,
+                null,
+                ContactsContract.Contacts.Entity.MIMETYPE + " = ?",
+                new String[]{ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE},
+                ContactsContract.CommonDataKinds.Phone.IS_PRIMARY + " desc ");
+
+        String dialNumber = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            String normalizedNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER));
+            String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+            dialNumber = normalizedNumber != null? normalizedNumber: number;
+
+            cursor.close();
+        }
+
+        return dialNumber;
     }
 
     @Override
