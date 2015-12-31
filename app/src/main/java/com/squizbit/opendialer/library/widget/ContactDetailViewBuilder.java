@@ -27,6 +27,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.squizbit.opendialer.OpenDialerApplication;
 import com.squizbit.opendialer.R;
 import com.squizbit.opendialer.library.widget.BottomSheet.ViewBuilder;
 import com.squizbit.opendialer.models.ContactColorGenerator;
@@ -117,6 +120,9 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
         mView = getLayoutInflater().inflate(R.layout.contact_detail_view, parent, false);
         mParent = parent;
         getLoaderManager().restartLoader(9980, null, this);
+        Tracker tracker = ((OpenDialerApplication)getOwner().getApplication()).getAnalyticsTracker();
+        tracker.setScreenName(getContext().getString(R.string.analytics_contact_details_screen));
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
 
         return mView;
     }
