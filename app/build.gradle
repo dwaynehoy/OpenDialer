@@ -95,7 +95,7 @@ android {
             debuggable false
             applicationIdSuffix ".String"
             signingConfig signingConfigs.staging
-            buildConfigField 'string', 'OPENDIALER_ANALYTICS_KEY', '"'+getAnalyticsKey()+'"'
+            buildConfigField 'String', 'OPENDIALER_ANALYTICS_KEY', '"'+getAnalyticsKey()+'"'
         }
     }
 
