@@ -24,8 +24,8 @@ android {
         applicationId "com.squizbit.opendialer"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 17
-        versionName "1.1.0." + getBuildNumber()
+        versionCode 18
+        versionName "1.1.1." + getBuildNumber()
         renderscriptSupportModeEnabled true
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
