@@ -74,6 +74,14 @@ public abstract class ViewBuilder {
     }
 
     /**
+     * Returns the owning activity
+     * @return The owning activity
+     */
+    public FragmentActivity getOwner(){
+        return mActivity;
+    }
+
+    /**
      * A lister which allows the BottomSheet to receive a callback from the ViewBuilder when it's requesting
      * the window to be dismissed
      */

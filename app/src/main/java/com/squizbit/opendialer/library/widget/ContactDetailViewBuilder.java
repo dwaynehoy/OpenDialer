@@ -1,5 +1,8 @@
 package com.squizbit.opendialer.library.widget;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -17,11 +20,16 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.PopupMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.squizbit.opendialer.OpenDialerApplication;
 import com.squizbit.opendialer.R;
 import com.squizbit.opendialer.library.widget.BottomSheet.ViewBuilder;
 import com.squizbit.opendialer.models.ContactColorGenerator;
@@ -41,7 +49,6 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
     private ViewGroup mParent;
     private DialerHelper mDialerHelper;
     Preferences mPreferences;
-
 
     private View.OnClickListener mOnNumberClickListener = new View.OnClickListener() {
         @Override
@@ -75,6 +82,32 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
         }
     };
 
+    private View.OnLongClickListener mOnPopupMenuTriggerListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(final View v) {
+            PopupMenu popupMenu = new PopupMenu(getContext(), v);
+            MenuItem menuItem = popupMenu.getMenu().add(0, 1, 0, R.string.context_menu_copy);
+            menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                    clipboard.setPrimaryClip(ClipData.newPlainText("", v.getTag().toString()));
+
+                    return true;
+                }
+            });
+            popupMenu.show();
+
+            return true;
+        }
+    };
+
+    /**
+     * Creates a new ContactDetailViewBuilder instance
+     * @param owner The owning activity
+     * @param lookupId The contact lookup id
+     * @param dialerHelper The dialer helper responsible for trigger any call requests
+     */
     public ContactDetailViewBuilder(FragmentActivity owner, String lookupId, DialerHelper dialerHelper) {
         super(owner);
         mLookupId = lookupId;
@@ -87,6 +120,9 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
         mView = getLayoutInflater().inflate(R.layout.contact_detail_view, parent, false);
         mParent = parent;
         getLoaderManager().restartLoader(9980, null, this);
+        Tracker tracker = ((OpenDialerApplication)getOwner().getApplication()).getAnalyticsTracker();
+        tracker.setScreenName(getContext().getString(R.string.analytics_contact_details_screen));
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
 
         return mView;
     }
@@ -108,7 +144,6 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         String displayImage = null;
-        String colorKey = null;
 
         if (data.moveToFirst()) {
             do {
@@ -179,6 +214,8 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
         ((TextView) view.findViewById(R.id.textViewType)).setText(type);
 
         view.setOnClickListener(mOnNumberClickListener);
+        view.setOnLongClickListener(mOnPopupMenuTriggerListener);
+
         if(isPrimary){
             parent.addView(view, 0);
         } else {
@@ -193,6 +230,7 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
         View view = getLayoutInflater().inflate(R.layout.contact_detail_item_view, parent, false);
         view.setTag(email);
         view.setOnClickListener(mOnEmailClickListener);
+        view.setOnLongClickListener(mOnPopupMenuTriggerListener);
 
         ((TextView) view.findViewById(R.id.textViewItem)).setText(email);
 
@@ -206,6 +244,7 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
         View view = getLayoutInflater().inflate(R.layout.contact_detail_item_view, parent, false);
         view.setTag(url);
         view.setOnClickListener(mOnWebLinkClick);
+        view.setOnLongClickListener(mOnPopupMenuTriggerListener);
 
         ((TextView) view.findViewById(R.id.textViewItem)).setText(url);
 
@@ -291,4 +330,5 @@ public class ContactDetailViewBuilder extends ViewBuilder implements LoaderManag
     public void onLoaderReset(Loader<Cursor> loader) {
         //Nothing to do here
     }
+
 }

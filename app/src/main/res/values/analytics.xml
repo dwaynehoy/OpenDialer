@@ -1,26 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="analytics_category_user_actions">User Actions</string>
+    <string name="analytics_dialer_screen">Dialer</string>
+    <string name="analytics_search_screen">Contact search</string>
     <string name="analytics_contact_screen">Contact list</string>
     <string name="analytics_call_log_screen">Recent list</string>
-    <string name="analytics_profile_screen">Profile</string>
-    <string name="analytics_login_screen">Sign in</string>
-    <string name="analytics_signup_screen">Sign up</string>
     <string name="analytics_contact_details_screen">Contact details</string>
-    <string name="analytics_dialer_screen">Dialer</string>
+
+    <!--Not used yet-->
     <string name="analytics_action_trigger_call">Trigger call</string>
-    <string name="analytics_action_speaker_toggle">Speaker</string>
-    <string name="analytics_value_on">ON</string>
-    <string name="analytics_value_off">OFF</string>
-    <string name="analytics_action_dialer_toggle">Keypad</string>
-    <string name="analytics_action_mute_toggle">Mute</string>
-    <string name="analytics_active_call_screen">Active Call</string>
-    <string name="analytics_conversation_screen">Message list</string>
-    <string name="analytics_messages_screen">Message detail</string>
     <string name="analytics_settings_screen">Settings</string>
-    <string name="analytics_action_logout">Logout</string>
-    <string name="analytics_action_terms">Terms</string>
-    <string name="analytics_action_feedback">Feedback</string>
-    <string name="analytics_pairing_screen">Pairing</string>
-    <string name="analytics_action_pair_success">Success</string>
-    <string name="analytics_action_pairing">Pairing</string>
+
 </resources>

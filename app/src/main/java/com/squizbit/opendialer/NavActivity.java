@@ -22,6 +22,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.squizbit.opendialer.fragment.CallLogFragment;
 import com.squizbit.opendialer.fragment.ContactsFragment;
 import com.squizbit.opendialer.fragment.DialerSearchFragment;
@@ -76,12 +78,21 @@ public class NavActivity extends AppCompatActivity implements FabControllerOwner
         mNavViewPager.setOffscreenPageLimit(3);
         mNavViewPager.setAdapter(fragmentAdapter);
         mNavTabLayout.setupWithViewPager(mNavViewPager);
+        mNavViewPager.addOnPageChangeListener(fragmentAdapter);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search_menu, menu);
         return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Tracker tracker = ((OpenDialerApplication)getApplication()).getAnalyticsTracker();
+        tracker.setScreenName(getString(R.string.analytics_favorites_screen));
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     @Override
@@ -152,6 +163,10 @@ public class NavActivity extends AppCompatActivity implements FabControllerOwner
     }
 
     private void switchToDialer() {
+        Tracker tracker = ((OpenDialerApplication)getApplication()).getAnalyticsTracker();
+        tracker.setScreenName(getString(R.string.analytics_dialer_screen));
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(mPrimaryContainer.getId(), DialerSearchFragment.newInstance(DialerSearchFragment.SEARCH_MODE_DIALER), DIALER_SEARCH_FRAGMENT)
@@ -160,6 +175,10 @@ public class NavActivity extends AppCompatActivity implements FabControllerOwner
     }
 
     private void switchToSearch() {
+        Tracker tracker = ((OpenDialerApplication)getApplication()).getAnalyticsTracker();
+        tracker.setScreenName(getString(R.string.analytics_search_screen));
+        tracker.send(new HitBuilders.ScreenViewBuilder().build());
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(mPrimaryContainer.getId(), DialerSearchFragment.newInstance(DialerSearchFragment.SEARCH_MODE_INPUT), DIALER_SEARCH_FRAGMENT)
@@ -263,7 +282,7 @@ public class NavActivity extends AppCompatActivity implements FabControllerOwner
     /**
      * A fragment adapter which manages the different core app pages.
      */
-    private class NavFragmentAdapter extends FragmentStatePagerAdapter {
+    private class NavFragmentAdapter extends FragmentStatePagerAdapter implements ViewPager.OnPageChangeListener {
 
         public NavFragmentAdapter(FragmentManager fm) {
             super(fm);
@@ -299,6 +318,34 @@ public class NavActivity extends AppCompatActivity implements FabControllerOwner
                 default:
                     return "";
             }
+        }
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            //NA
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            Tracker tracker = ((OpenDialerApplication)getApplication()).getAnalyticsTracker();
+            switch (position) {
+                case 0:
+                    tracker.setScreenName(getString(R.string.analytics_favorites_screen));
+                    break;
+                case 1:
+                    tracker.setScreenName(getString(R.string.analytics_contact_screen));
+                    break;
+                case 2:
+                    tracker.setScreenName(getString(R.string.analytics_call_log_screen));
+                    break;
+            }
+
+            tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+            //NA
         }
     }
 

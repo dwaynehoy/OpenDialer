@@ -43,5 +43,7 @@
     <string name="error_missing_contacts_permission_search_action">Click here to enable permission</string>
 
     <string name="error_missing_call_log_permission">This app needs <b>call and contact permissions</b> in order to access your recent calls, click here to enable permission</string>
+    <string name="context_menu_copy">Copy to clipboard</string>
+    <string name="analytics_favorites_screen">Favorites</string>
 
 </resources>

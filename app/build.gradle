@@ -16,14 +16,16 @@ android {
 
     packagingOptions {
         exclude 'LICENSE.txt'
+        exclude 'META-INF/maven/com.google.guava/guava/pom.properties'
+        exclude 'META-INF/maven/com.google.guava/guava/pom.xml'
     }
 
     defaultConfig {
         applicationId "com.squizbit.opendialer"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 17
-        versionName "1.1.0." + getBuildNumber()
+        versionCode 18
+        versionName "1.1.1." + getBuildNumber()
         renderscriptSupportModeEnabled true
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -68,6 +70,8 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.production
+
+            buildConfigField 'String', 'OPENDIALER_ANALYTICS_KEY', '"'+getAnalyticsKey()+'"'
         }
 
         debug {
@@ -75,6 +79,7 @@ android {
             debuggable true
             applicationIdSuffix ".debug"
             signingConfig signingConfigs.debug
+            buildConfigField 'String', 'OPENDIALER_ANALYTICS_KEY', '"'+getAnalyticsKey()+'"'
         }
 
         internal_test {
@@ -82,13 +87,15 @@ android {
             debuggable true
             applicationIdSuffix ".test"
             signingConfig signingConfigs.debug
+            buildConfigField'String', 'OPENDIALER_ANALYTICS_KEY', '"'+getAnalyticsKey()+'"'
         }
 
         staging {
             minifyEnabled false
             debuggable false
-            applicationIdSuffix ".staging"
+            applicationIdSuffix ".String"
             signingConfig signingConfigs.staging
+            buildConfigField 'String', 'OPENDIALER_ANALYTICS_KEY', '"'+getAnalyticsKey()+'"'
         }
     }
 
@@ -105,13 +112,25 @@ def getBuildNumber() {
     return buildString;
 }
 
+def getAnalyticsKey() {
+    def analyticsKey = System.getenv()['OPENDIALER_ANALYTICS_KEY']
+
+    if(analyticsKey == null){
+        analyticsKey =  "Null";
+    }
+
+    return analyticsKey;
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    androidTestCompile('com.android.support.test:runner:0.3') {
+    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.1'
+
+    androidTestCompile('com.android.support.test:runner:0.4.1') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestCompile('com.android.support.test:rules:0.3') {
+    androidTestCompile('com.android.support.test:rules:0.4.1') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2') {
@@ -134,11 +153,11 @@ dependencies {
     compile 'com.android.support:cardview-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:recyclerview-v7:23.1.1'
-    compile 'com.google.android.gms:play-services-gcm:8.3.0'
+    compile 'com.google.android.gms:play-services-gcm:8.4.0'
     compile 'com.jakewharton:butterknife:6.1.0'
     compile 'com.googlecode.libphonenumber:libphonenumber:3.1'
     compile 'com.mcxiaoke.volley:library:1.0.15'
     compile 'squizbit.com.jsonobjectified:jetjson:1.0.3@aar'
-    compile 'com.google.android.gms:play-services-analytics:8.3.0'
+    compile 'com.google.android.gms:play-services-analytics:8.4.0'
     compile 'com.android.support:palette-v7:23.1.1'
 }

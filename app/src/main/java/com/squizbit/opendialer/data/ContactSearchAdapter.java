@@ -5,9 +5,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.provider.ContactsContract;
-import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,9 +20,6 @@ import com.google.i18n.phonenumbers.Phonenumber;
 import com.squizbit.opendialer.R;
 import com.squizbit.opendialer.models.ContactColorGenerator;
 import com.squizbit.opendialer.models.ContactImage;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -125,23 +120,6 @@ public class ContactSearchAdapter extends RecyclerView.Adapter<ContactSearchAdap
         } catch (NumberParseException e) {
             return number;
         }
-    }
-
-    private Bitmap getContactImage(String uriString, int dimen){
-        if(uriString == null || uriString.isEmpty()){
-            return null;
-        }
-
-        try {
-            Uri uri = Uri.parse(uriString);
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), uri);
-            return Bitmap.createScaledBitmap(bitmap, dimen, dimen, true);
-        } catch (FileNotFoundException e) {
-            return null;
-        } catch (IOException e) {
-            return null;
-        }
-
     }
 
     @Override
